@@ -770,7 +770,8 @@ input,select,textarea,button{font-family:'Google Sans','Roboto','Segoe UI',syste
   <div class="chat-main">
     <div class="topbar">
       <div class="tb-left">
-        <button class="tb-menu" onclick="toggleSidebar()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+        <!-- Removed inline onclick, will be handled by script at bottom -->
+        <button class="tb-menu"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
         <div style="position:relative"><button class="m-pill" id="m-pill-btn"><span class="live-dot"></span><span id="m-label">NA Track</span><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></button><div class="m-drop" id="m-drop" style="display:none"></div></div>
         <button class="chat-prompt-badge" id="chat-prompt-badge" onclick="openChatPrompt()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Prompt</button>
       </div>
@@ -830,7 +831,8 @@ input,select,textarea,button{font-family:'Google Sans','Roboto','Segoe UI',syste
   <input type="file" id="pfin" accept=".pdf" onchange="handlePdf(this)" style="display:none"/>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<script>
 /* devtools protection removed */
 (function(){var a=[];var h='';if(false){if(false){document.addEventListener('DOMContentLoaded',function(){document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0f0f0f;color:#ef4444;font-family:monospace;font-size:13px;flex-direction:column;gap:10px"><div style="font-size:28px">&#128274;</div><div>Unauthorized domain.</div></div>';});window.getApiKey=function(){return '';};}}})();
 document.addEventListener('selectstart',function(e){var el=e.target;if(el.tagName==='TEXTAREA'||el.tagName==='INPUT')return true;while(el){if(el.classList&&(el.classList.contains('ai-body')||el.classList.contains('ubub')||el.classList.contains('kv'))){return true;}el=el.parentElement;}e.preventDefault();return false;},false);
@@ -2033,6 +2035,23 @@ window.addEventListener('beforeinstallprompt',function(e){
 function installPwa(){if(_deferredPrompt){_deferredPrompt.prompt();_deferredPrompt.userChoice.then(function(){_deferredPrompt=null;dismissPwaBanner();});}}
 function dismissPwaBanner(){var b=document.getElementById('pwa-banner');if(b)b.style.display='none';localStorage.setItem('ngpt_pwa_dismissed','1');}
 
+// FIX: Ensure the hamburger menu works reliably on mobile
+document.addEventListener('DOMContentLoaded', function() {
+  var menuBtn = document.querySelector('.tb-menu');
+  if (menuBtn) {
+    // Remove any existing inline onclick to avoid double-firing
+    menuBtn.removeAttribute('onclick');
+    // Attach both click and touch events
+    menuBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      toggleSidebar();
+    });
+    menuBtn.addEventListener('touchstart', function(e) {
+      e.preventDefault();
+      toggleSidebar();
+    }, { passive: false });
+  }
+});
 </script>
 </body>
 </html>
