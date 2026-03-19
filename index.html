@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=yes"/>
 <title>NexoGPT</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231f2328'/%3E%3Cg transform='rotate(45 16 16)'%3E%3Cpath d='M16 4s-1 5.5-4.2 8.8C8.5 16 3 16 3 16s5.5 1 8.8 4.2C15 23.5 16 29 16 29s1-5.5 4.2-8.8C23.5 17 29 16 29 16s-5.5-1-8.8-4.2C17 8.5 16 4 16 4z' fill='white'/%3E%3C/g%3E%3C/svg%3E"/>
 <meta name="theme-color" content="#f0f4f9" id="theme-meta"/>
@@ -23,8 +23,7 @@ html,body{height:100%;overflow:hidden;font-family:'Google Sans','Roboto','Segoe 
 :root{--bg:#f0f4f9;--s1:#ffffff;--s2:#f8f9fb;--s3:#eef1f5;--s4:#e3e7ed;--bd:rgba(0,0,0,.08);--bd2:rgba(0,0,0,.11);--bd3:rgba(0,0,0,.18);--a:#444746;--al:#5f6368;--ah:#2d2f30;--a-dim:#3c4043;--a10:rgba(68,71,70,.08);--a15:rgba(68,71,70,.12);--a06:rgba(68,71,70,.05);--a-glow:rgba(68,71,70,.15);--t1:#1f2328;--t2:#444746;--t3:#80868b;--nav-w:260px;--r-xs:4px;--r-sm:8px;--r-md:12px;--r-lg:16px;--r-xl:24px;--t-fast:110ms;--t-base:170ms;--t-slow:280ms;--ease-out:cubic-bezier(.16,1,.3,1);--ease-spring:cubic-bezier(.34,1.2,.64,1);--shadow-sm:0 1px 3px rgba(0,0,0,.08);--shadow:0 2px 12px rgba(0,0,0,.1);--shadow-lg:0 8px 32px rgba(0,0,0,.15)}
 [data-theme="light"]{--bg:#f0f4f9;--s1:#ffffff;--s2:#f8f9fb;--s3:#eef1f5;--s4:#e3e7ed;--t1:#1f2328;--t2:#444746;--t3:#80868b}
 [data-theme="dark"]{--bg:#0f1117;--s1:#1a1d27;--s2:#1e2130;--s3:#252838;--s4:#2e3245;--bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.1);--bd3:rgba(255,255,255,.16);--a:#a8b4c8;--al:#8896aa;--ah:#d0d8e8;--a-dim:#8896aa;--a10:rgba(168,180,200,.08);--a15:rgba(168,180,200,.12);--a06:rgba(168,180,200,.05);--a-glow:rgba(168,180,200,.15);--t1:#e8edf5;--t2:#a8b4c8;--t3:#5a6478}
-.dark-toggle{position:fixed;bottom:20px;right:20px;z-index:999;width:40px;height:40px;border-radius:50%;border:1px solid var(--bd2);background:var(--s2);color:var(--t2);font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);transition:background .2s,color .2s,transform .15s;line-height:1}
-.dark-toggle:hover{background:var(--s3);transform:scale(1.1)}
+/* Dark toggle removed – no longer needed */
 /* Chat search */
 .sb-search-wrap{padding:8px 10px 4px;flex-shrink:0}
 .sb-search{display:flex;align-items:center;gap:7px;background:var(--s3);border:1px solid var(--bd);border-radius:var(--r-sm);padding:7px 10px;transition:border-color .15s}
@@ -93,8 +92,12 @@ html,body{height:100%;overflow:hidden;font-family:'Google Sans','Roboto','Segoe 
 .pwa-close-btn{background:none;border:none;color:var(--t3);cursor:pointer;font-size:18px;padding:0 4px;line-height:1}
 /* Mobile improvements */
 @media(max-width:768px){
-  .dark-toggle{bottom:68px;right:12px;width:36px;height:36px;font-size:15px}
   .pwa-banner{bottom:66px}
+  /* Larger tap targets */
+  .tb-menu, .voice-btn, .send-btn, .i-tbtn { min-width: 44px; min-height: 44px; }
+  .sidebar { transform: translateX(-100%); transition: transform 0.2s ease; }
+  .sidebar.mobile-open { transform: translateX(0); }
+  .ubub { max-width: 85%; }
 }
 .perf-mode *,.perf-mode *::before,.perf-mode *::after{animation:none!important;transition:none!important}
 *{scrollbar-width:thin;scrollbar-color:var(--s3) transparent}
@@ -207,7 +210,7 @@ html,body{height:100%;overflow:hidden;font-family:'Google Sans','Roboto','Segoe 
 .sb-brand{display:flex;align-items:center;gap:10px;padding:8px 10px 12px}
 .sb-brand-icon{width:32px;height:32px;min-width:32px;border-radius:10px;background:#f8f9fb;border:1px solid #dadce0;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .sb-brand-name{font-size:16px;font-weight:600;color:var(--t1);letter-spacing:-.01em;white-space:nowrap}
-.nc-btn{width:100%;padding:10px 12px;border-radius:var(--r-sm);background:#f8f9fb;border:1px solid #dadce0;color:var(--t1);font-weight:500;font-weight:500;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;font-family:inherit;transition:all .15s;white-space:nowrap}
+.nc-btn{width:100%;padding:10px 12px;border-radius:var(--r-sm);background:#f8f9fb;border:1px solid #dadce0;color:var(--t1);font-weight:500;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;font-family:inherit;transition:all .15s;white-space:nowrap}
 .nc-btn:hover{background:var(--s3);color:var(--t1);border-color:var(--bd3)}
 .sb-search{display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--r-sm);padding:8px 11px;margin:10px 10px 5px;transition:border-color .2s;flex-shrink:0}
 .sb-search:focus-within{border-color:var(--a)}
@@ -299,6 +302,7 @@ html,body{height:100%;overflow:hidden;font-family:'Google Sans','Roboto','Segoe 
 .token-counter.danger{color:#f87171;border-color:rgba(248,113,113,.25)}
 .chat-prompt-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;border:1px solid var(--a15);background:var(--a06);color:var(--a);font-size:10.5px;font-weight:600;cursor:pointer;transition:all .12s}
 .chat-prompt-badge:hover{background:var(--a10);border-color:var(--a)}
+/* Mode selector restored */
 .mode-wrap{position:relative}
 .mode-pill{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:7px;border:1px solid var(--bd);background:transparent;color:var(--t3);font-size:12px;cursor:pointer;font-family:inherit;font-weight:500;transition:all .12s}
 .mode-pill:hover,.mode-pill.on{border-color:var(--a);color:var(--a);background:var(--a06)}
@@ -587,7 +591,6 @@ input,select,textarea,button{font-family:'Google Sans','Roboto','Segoe UI',syste
 .ai-body code,.ai-body pre{font-family:'Monaco','Menlo','Cascadia Code','Consolas',monospace}
 .m-name,.m-desc,.mode-name,.mode-desc,.prompt-card-title,.prompt-card-text{font-family:'Google Sans','Roboto','Segoe UI',system-ui,Arial,sans-serif}
 .setting-label,.shortcut-desc,.usage-stat-label{font-family:'Google Sans','Roboto','Segoe UI',system-ui,Arial,sans-serif}
-
 </style>
 </head>
 <body>
@@ -787,7 +790,15 @@ input,select,textarea,button{font-family:'Google Sans','Roboto','Segoe UI',syste
             <div class="input-top">
               <textarea id="msg-in" class="input-ta" rows="1" placeholder="Ask anything…" autocomplete="off" spellcheck="true"></textarea>
               <button class="voice-btn" id="voice-btn" title="Voice (Ctrl+M)" onclick="toggleVoice()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
-              <div class="mode-wrap" id="mode-wrap"><button class="mode-pill on" id="mode-pill"><svg width="7" height="7" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg><span id="mode-lbl">Standard</span><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></button><div class="mode-drop" id="mode-drop" style="display:none"></div></div>
+              <!-- Mode selector restored -->
+              <div class="mode-wrap" id="mode-wrap">
+                <button class="mode-pill on" id="mode-pill">
+                  <svg width="7" height="7" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg>
+                  <span id="mode-lbl">Standard</span>
+                  <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <div class="mode-drop" id="mode-drop" style="display:none"></div>
+              </div>
               <button class="send-btn" id="send-btn" disabled><svg id="send-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg><svg id="stop-icon" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="display:none"><rect x="4" y="4" width="16" height="16" rx="2"/></svg></button>
             </div>
             <div class="input-bot">
@@ -871,13 +882,22 @@ async function streamGemini(key,modelId,msgs,system,maxTok,onChunk){var contents
 async function streamAnthropic(key,msgs,system,maxTok,onChunk){var apiMsgs=buildApiMsgsAnthropic(msgs);var sysBlock=[{type:'text',text:system,cache_control:{type:'ephemeral'}}];var payload={stream:true,model:'claude-sonnet-4-6',max_tokens:Math.min(maxTok,4096),system:sysBlock,messages:apiMsgs};var res=await fetch('https://hidden-hat-8de6.heldpython.workers.dev/',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-beta':'prompt-caching-2024-07-31','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify(payload)});if(!res.ok){var ed={};try{ed=await res.json();}catch(e){}var msg=(ed.error&&ed.error.message)||'Anthropic error '+res.status;if(res.status===429)throw new Error('__RATELIMIT__'+msg+'||'+(Date.now()/1000+60));if(res.status===402||msg.includes('credit')||msg.includes('billing'))throw new Error('__BILLING__'+msg);throw new Error(msg);}var reader=res.body.getReader();_activeReader=reader;var decoder=new TextDecoder(),buf='',acc='';while(true){if(stopFlag){try{reader.cancel();}catch(e){}break;}var ref=await reader.read();if(ref.done)break;buf+=decoder.decode(ref.value,{stream:true});var lines=buf.split('\n');buf=lines.pop();for(var li=0;li<lines.length;li++){var line=lines[li].trim();if(!line||!line.startsWith('data:'))continue;var raw=line.slice(5).trim();if(raw==='[DONE]')break;var evt;try{evt=JSON.parse(raw);}catch(e){continue;}if(evt.type==='content_block_delta'&&evt.delta&&evt.delta.type==='text_delta'&&evt.delta.text){acc+=evt.delta.text;onChunk(evt.delta.text);}}}return{accumulated:acc};}
 function buildApiMsgsAnthropic(msgs){var out=[];msgs.forEach(function(m){if(m.role==='user'){var c=(m.content||'(empty)').trim();if(m.pdfs&&m.pdfs.length)c=m.pdfs.map(function(p){return '[PDF: '+p.name+']\n'+p.text;}).join('\n\n')+(c?'\n\n'+c:'');out.push({role:'user',content:c||'(empty)'});}else if(m.role==='assistant'){var c2=(m.content||'').trim();if(!c2||/^__\w+__/.test(c2))return;if(c2.startsWith('__PAUSED__'))c2=c2.slice(9).trim()||'[paused]';out.push({role:'assistant',content:c2});}});while(out.length&&out[0].role!=='user')out.shift();var cleaned=[];out.forEach(function(m){if(!cleaned.length){cleaned.push(m);return;}var last=cleaned[cleaned.length-1];if(last.role===m.role){if(m.role==='user')cleaned[cleaned.length-1]={role:'user',content:last.content+'\n'+m.content};else cleaned[cleaned.length-1]=m;}else cleaned.push(m);});while(cleaned.length&&cleaned[cleaned.length-1].role!=='user')cleaned.pop();return cleaned.slice(-20);}
 function stripPollinationsNotice(text){
-var markers=['IMPORTANT NOTICE','Pollinations legacy','text API is being deprecated','migrate to our new service','enter.pollinations.ai'];
-var earliest=text.length;markers.forEach(function(m){var idx=text.indexOf(m);if(idx!==-1&&idx<earliest)earliest=idx;});if(earliest<text.length){
-var lineStart=text.lastIndexOf('\n',earliest);if(lineStart===-1)lineStart=0;else lineStart++;
-var before=text.slice(0,lineStart).trim();var after=text.slice(earliest);
-var noteEnd=after.indexOf('\nNote: Anonymous');if(noteEnd!==-1)after=after.slice(noteEnd);var endNote=after.indexOf('\n',after.indexOf('\n')+1);
-var noticeBlock=text.slice(lineStart);var endIdx=noticeBlock.search(/\n(?!\s*(The Pollinations|Please migrate|Note:|⚠|IMPORTANT))/i);if(endIdx!==-1)noticeBlock=noticeBlock.slice(endIdx).trim();else noticeBlock='';text=before+(before&&noticeBlock?' '+noticeBlock:noticeBlock);}
-text=text.replace(/^.*?IMPORTANT NOTICE.*$/gmi,'').replace(/^.*?Pollinations legacy.*$/gmi,'').replace(/^.*?migrate to our new service.*$/gmi,'').replace(/^.*?Anonymous requests.*$/gmi,'').replace(/^.*?enter\.pollinations\.ai.*$/gmi,'').replace(/\n{3,}/g,'\n\n').trim();return text;}
+  // Remove any lines that contain ad‑related keywords
+  var lines = text.split('\n');
+  var filtered = lines.filter(line => {
+    var lower = line.toLowerCase();
+    return !lower.includes('pollinations') && !lower.includes('sponsored') && !lower.includes('advertisement') && !lower.includes('important notice') && !lower.includes('please migrate') && !lower.includes('note: anonymous') && !lower.includes('enter.pollinations.ai');
+  });
+  text = filtered.join('\n');
+  // Also remove any standalone paragraphs that might be ads
+  text = text.replace(/.*?IMPORTANT NOTICE.*?(\n|$)/gi, '');
+  text = text.replace(/.*?Pollinations legacy.*?(\n|$)/gi, '');
+  text = text.replace(/.*?migrate to our new service.*?(\n|$)/gi, '');
+  text = text.replace(/.*?Anonymous requests.*?(\n|$)/gi, '');
+  text = text.replace(/.*?enter\.pollinations\.ai.*?(\n|$)/gi, '');
+  text = text.replace(/\n{3,}/g, '\n\n').trim();
+  return text;
+}
 async function streamPollinations(msgs,system,maxTok,onChunk){
   var builtMsgs=buildOpenAIMsgs(msgs,system);
   // Trim to last 10 messages to reduce payload size and improve reliability
@@ -905,7 +925,7 @@ async function streamPollinations(msgs,system,maxTok,onChunk){
       var content=(data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content)||'';
       if(!content){lastErr=new Error('Empty');continue;}
       // Strip any Pollinations notices
-      content=content.split('IMPORTANT NOTICE')[0].trim();
+      content = stripPollinationsNotice(content);
 
       var words=content.split(' ');var acc='';
       for(var wi=0;wi<words.length;wi++){
@@ -1548,7 +1568,7 @@ html+='<div><div style="font-size:12.5px;font-weight:700;color:'+m.color+'">'+es
 feats.forEach(function(f){html+='<div style="display:flex;align-items:flex-start;gap:9px;font-size:12.5px;color:var(--t2);margin-bottom:7px;line-height:1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="'+p.color+'" stroke-width="2.5" stroke-linecap="round" style="flex-shrink:0;margin-top:2px"><polyline points="20 6 9 17 4 12"/></svg><span>'+escHtml(f)+'</span></div>';});
 var btnBg=cur?p.color:isEmpire?'linear-gradient(90deg,#f97316,#ef4444)':'var(--s3)';
 var btnCol=cur?p.textColor:isEmpire?'#fff':'var(--t2)';
-html+='<button onclick="choosePlan(\"'+key+'\")" style="width:100%;padding:11px;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;border:none;margin-top:16px;background:'+btnBg+';color:'+btnCol+'">'+(cur?'\u2713 Current Plan':'Get '+p.name)+'</button>';
+html+='<button onclick="choosePlan(\"'+key+'\')" style="width:100%;padding:11px;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;border:none;margin-top:16px;background:'+btnBg+';color:'+btnCol+'">'+(cur?'\u2713 Current Plan':'Get '+p.name)+'</button>';
 html+='</div>';
 });document.getElementById('plans-grid').innerHTML=html;}
 function choosePlan(key){S.plan=key;var p=PLANS[key];if(p&&p.model){S.model=p.model;localStorage.setItem('ngpt_model',p.model);}save();go('chat');showToast((PLANS[key]&&PLANS[key].name||key)+' plan activated!');var upgBtn=document.getElementById('upgrade-plan-btn');if(upgBtn&&(key==='empire'||key==='dev'))upgBtn.style.display='none';}
@@ -1762,7 +1782,7 @@ function onTa(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeigh
 function handleImg(input){Array.from(input.files).forEach(function(f){var r=new FileReader();r.onload=function(e){S.imgs.push({url:e.target.result,name:f.name,type:f.type});rebuildAtt();};r.readAsDataURL(f);});input.value='';}
 function handleVid(input){Array.from(input.files).forEach(function(f){S.vids.push({url:URL.createObjectURL(f),name:f.name});rebuildAtt();});input.value='';}
 async function handlePdf(input){var files=Array.from(input.files);input.value='';for(var fi=0;fi<files.length;fi++){var f=files[fi];showToast('Extracting PDF\u2026');var text=await extractPdfText(f);S.pdfs.push({name:f.name,text:text});rebuildAtt();}}
-function rebuildAtt(){var aa=document.getElementById('att-area');if(!aa)return;aa.innerHTML='';if(!S.imgs.length&&!S.vids.length&&!S.texts.length&&!S.pdfs.length){aa.classList.remove('on');updateSendBtn();return;}aa.classList.add('on');S.texts.forEach(function(tx,i){var chip=document.createElement('div');chip.className='att-chip text-chip';var preview=document.createElement('div');preview.className='att-chip-text-preview';preview.textContent=tx.content;var footer=document.createElement('div');footer.className='att-chip-text-footer';var badge=document.createElement('span');badge.className='att-chip-pasted-badge';badge.textContent='PASTED';var len=document.createElement('span');len.className='att-chip-text-len';len.textContent=tx.label+' \xB7 '+(tx.content.length>999?(Math.round(tx.content.length/100)/10)+'k':tx.content.length)+' chars';footer.appendChild(badge);footer.appendChild(len);var rm=document.createElement('button');rm.className='att-chip-rm';rm.innerHTML='\u2715';rm.addEventListener('click',function(e){e.stopPropagation();S.texts.splice(i,1);rebuildAtt();});chip.appendChild(preview);chip.appendChild(footer);chip.appendChild(rm);aa.appendChild(chip);});S.imgs.forEach(function(im,i){var chip=document.createElement('div');chip.className='att-chip';var thumb=document.createElement('img');thumb.className='att-chip-img';thumb.src=im.url;var info=document.createElement('div');info.className='att-chip-info';var nm=document.createElement('div');nm.className='att-chip-name';nm.textContent=im.name||'image';var tp=document.createElement('div');tp.className='att-chip-type';tp.textContent=(im.type||'image').replace('image/','');info.appendChild(nm);info.appendChild(tp);var rm=document.createElement('button');rm.className='att-chip-rm';rm.innerHTML='\u2715';rm.addEventListener('click',function(){S.imgs.splice(i,1);rebuildAtt();});chip.appendChild(thumb);chip.appendChild(info);chip.appendChild(rm);aa.appendChild(chip);});S.pdfs.forEach(function(pdf,i){var chip=document.createElement('div');chip.className='att-chip';var ico=document.createElement('div');ico.className='att-chip-icon';ico.textContent='\uD83D\uDCC4';var info=document.createElement('div');info.className='att-chip-info';var nm=document.createElement('div');nm.className='att-chip-name';nm.textContent=pdf.name||'file.pdf';var tp=document.createElement('div');tp.className='att-chip-type';tp.textContent='PDF';info.appendChild(nm);info.appendChild(tp);var rm=document.createElement('button');rm.className='att-chip-rm';rm.innerHTML='\u2715';rm.addEventListener('click',function(){S.pdfs.splice(i,1);rebuildAtt();});chip.appendChild(ico);chip.appendChild(info);chip.appendChild(rm);aa.appendChild(chip);});updateSendBtn();}
+function rebuildAtt(){var aa=document.getElementById('att-area');if(!aa)return;aa.innerHTML='';if(!S.imgs.length&&!S.vids.length&&!S.texts.length&&!S.pdfs.length){aa.classList.remove('on');updateSendBtn();return;}aa.classList.add('on');S.texts.forEach(function(tx,i){var chip=document.createElement('div');chip.className='att-chip.text-chip';var preview=document.createElement('div');preview.className='att-chip-text-preview';preview.textContent=tx.content;var footer=document.createElement('div');footer.className='att-chip-text-footer';var badge=document.createElement('span');badge.className='att-chip-pasted-badge';badge.textContent='PASTED';var len=document.createElement('span');len.className='att-chip-text-len';len.textContent=tx.label+' \xB7 '+(tx.content.length>999?(Math.round(tx.content.length/100)/10)+'k':tx.content.length)+' chars';footer.appendChild(badge);footer.appendChild(len);var rm=document.createElement('button');rm.className='att-chip-rm';rm.innerHTML='\u2715';rm.addEventListener('click',function(e){e.stopPropagation();S.texts.splice(i,1);rebuildAtt();});chip.appendChild(preview);chip.appendChild(footer);chip.appendChild(rm);aa.appendChild(chip);});S.imgs.forEach(function(im,i){var chip=document.createElement('div');chip.className='att-chip';var thumb=document.createElement('img');thumb.className='att-chip-img';thumb.src=im.url;var info=document.createElement('div');info.className='att-chip-info';var nm=document.createElement('div');nm.className='att-chip-name';nm.textContent=im.name||'image';var tp=document.createElement('div');tp.className='att-chip-type';tp.textContent=(im.type||'image').replace('image/','');info.appendChild(nm);info.appendChild(tp);var rm=document.createElement('button');rm.className='att-chip-rm';rm.innerHTML='\u2715';rm.addEventListener('click',function(){S.imgs.splice(i,1);rebuildAtt();});chip.appendChild(thumb);chip.appendChild(info);chip.appendChild(rm);aa.appendChild(chip);});S.pdfs.forEach(function(pdf,i){var chip=document.createElement('div');chip.className='att-chip';var ico=document.createElement('div');ico.className='att-chip-icon';ico.textContent='\uD83D\uDCC4';var info=document.createElement('div');info.className='att-chip-info';var nm=document.createElement('div');nm.className='att-chip-name';nm.textContent=pdf.name||'file.pdf';var tp=document.createElement('div');tp.className='att-chip-type';tp.textContent='PDF';info.appendChild(nm);info.appendChild(tp);var rm=document.createElement('button');rm.className='att-chip-rm';rm.innerHTML='\u2715';rm.addEventListener('click',function(){S.pdfs.splice(i,1);rebuildAtt();});chip.appendChild(ico);chip.appendChild(info);chip.appendChild(rm);aa.appendChild(chip);});updateSendBtn();}
 document.addEventListener('paste',function(e){var cd=e.clipboardData||window.clipboardData;if(!cd)return;var imgItems=[];for(var ii=0;ii<cd.items.length;ii++){var it=cd.items[ii];if(it.kind==='file'&&it.type.indexOf('image/')===0)imgItems.push(it);}if(imgItems.length){e.preventDefault();imgItems.forEach(function(it){var file=it.getAsFile();if(!file)return;var r=new FileReader();r.onload=function(ev){S.imgs.push({url:ev.target.result,name:file.name||'pasted.png',type:file.type||'image/png'});rebuildAtt();};r.readAsDataURL(file);});return;}var txt=cd.getData('text/plain')||'';if(/^\s*<script[\s>]/i.test(txt.trim())){e.preventDefault();return false;}var ta2=document.getElementById('msg-in');if((txt.length>=300||txt.split('\n').length>5)&&document.activeElement===ta2){e.preventDefault();var typeLabel='Text';if(/^\s*<(!DOCTYPE|html)/i.test(txt))typeLabel='HTML';else if(/^\s*\{/.test(txt))typeLabel='JSON';else if(/^\s*(import|export|function|const |let |var |class |def |#include)/.test(txt))typeLabel='Code';else if(/^\s*(SELECT|INSERT|UPDATE|DELETE)/i.test(txt))typeLabel='SQL';S.texts.push({content:txt,label:typeLabel});rebuildAtt();ta2.focus();updateSendBtn();}},false);
 var ART={open:false,tab:'preview',lang:'',title:'',rawCode:'',highlightedCode:''};
 function artOpen(lang,title,rawCode,hCode){ART.lang=lang;ART.title=title||lang;ART.rawCode=rawCode;ART.highlightedCode=hCode;ART.open=true;var panel=document.getElementById('artifact-panel');var titleEl=document.getElementById('art-title');if(titleEl)titleEl.textContent=ART.title;artTab((/^html?$/i.test(lang)||/^svg$/i.test(lang))?'preview':'code');if(panel)panel.classList.add('open');}
@@ -1877,7 +1897,8 @@ function applySiteLang(lang){
 // Apply saved site lang on load
 if(_settings.siteLang)applySiteLang(_settings.siteLang);
 </script>
-<button class="dark-toggle" id="dark-toggle" title="Toggle dark mode">🌙</button>
+
+<!-- Dark toggle button removed as requested -->
 <div class="pwa-banner" id="pwa-banner" style="display:none">
   <div style="font-size:22px">📱</div>
   <div class="pwa-banner-text">Install NexoGPT<div class="pwa-banner-sub">Add to home screen for the best experience</div></div>
@@ -2012,34 +2033,6 @@ window.addEventListener('beforeinstallprompt',function(e){
 function installPwa(){if(_deferredPrompt){_deferredPrompt.prompt();_deferredPrompt.userChoice.then(function(){_deferredPrompt=null;dismissPwaBanner();});}}
 function dismissPwaBanner(){var b=document.getElementById('pwa-banner');if(b)b.style.display='none';localStorage.setItem('ngpt_pwa_dismissed','1');}
 
-</script>
-<script>
-(function(){
-  var btn=document.getElementById('dark-toggle');
-  var html=document.documentElement;
-  var meta=document.getElementById('theme-meta');
-  var saved=localStorage.getItem('ngpt_theme');
-  function applyDark(theme){
-    html.setAttribute('data-theme',theme);
-    if(meta)meta.content=theme==='dark'?'#0f1117':'#f0f4f9';
-    if(btn)btn.textContent=theme==='dark'?'☀️':'🌙';
-    var chk=document.getElementById('theme-toggle-chk');
-    if(chk)chk.checked=theme==='dark';
-  }
-  if(saved)applyDark(saved);
-  if(btn)btn.addEventListener('click',function(){
-    var next=html.getAttribute('data-theme')==='dark'?'light':'dark';
-    localStorage.setItem('ngpt_theme',next);
-    applyDark(next);
-  });
-  var _orig=window.applyTheme;
-  window.applyTheme=function(isDark){
-    if(typeof _orig==='function')_orig(isDark);
-    var next=isDark?'dark':'light';
-    localStorage.setItem('ngpt_theme',next);
-    applyDark(next);
-  };
-})();
 </script>
 </body>
 </html>
