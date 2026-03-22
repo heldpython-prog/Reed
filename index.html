@@ -1671,7 +1671,7 @@ function stripPollinationsNotice(text){
 }
 async function streamPollinations(msgs,system,maxTok,onChunk){
   // Keep messages SHORT — big system prompts make Pollinations time out
-  var shortSys='You are NexoGPT, a smart helpful assistant. Today: '+new Date().toDateString()+'. Reply in the same language as the user. Be direct and accurate.';
+  var _nd=new Date();var shortSys='You are NexoGPT, a smart helpful assistant. Today: '+_nd.toDateString()+'. Current year: '+_nd.getFullYear()+'. The user is speaking to you in '+_nd.getFullYear()+', not 2023 or 2024. Reply in the same language as the user. Be direct and accurate.';
   var simpleMsgs=[{role:'system',content:shortSys}];
   // Only last 4 messages (2 exchanges)
   var recent=msgs.filter(function(m){return m.role==='user'||m.role==='assistant';}).slice(-4);
@@ -1931,21 +1931,29 @@ var SDPOOL=['wikipedia.org','reuters.com','bbc.com','apnews.com','ynet.co.il','h
 
 
 function shouldSearch(text){
-  if(!text)return false;
+  if(!text||text.trim().length<=4)return false;
   var t=text.trim();
-  if(t.length<=6)return false;
-  if(TRIVIAL_RE.test(t)||CODE_RE.test(t)||MATH_RE.test(t)||CREATIVE_RE.test(t))return false;
-  // Check all context patterns
-  for(var key in SEARCH_CONTEXTS){
-    if(SEARCH_CONTEXTS[key].detect.test(t))return true;
-  }
-  // General live-data triggers
-  // investing.com context
-  if(SEARCH_CONTEXTS['investing']&&SEARCH_CONTEXTS['investing'].detect.test(t))return true;
-  if(/\b(who is (the )?(current|new|latest)|capital of|population of|president of|ceo of)\b/i.test(t))return true;
-  if(/\b(news|headlines|what happened|breaking|latest update)\b/i.test(t))return true;
-  if(/\b(what time is it in|current time in|time in)\b/i.test(t))return true;
-  if(/חדשות|מה קורה היום|עדכונים/i.test(t))return true;
+  // Never search for pure code, math, creative writing, or greetings
+  if(TRIVIAL_RE.test(t))return false;
+  if(CODE_RE.test(t)&&!/(news|latest|update|current|2026|today|who|what happened|going on)/i.test(t))return false;
+  if(MATH_RE.test(t)&&!/(who|what|when|where|current|latest|today)/i.test(t))return false;
+  if(CREATIVE_RE.test(t)&&t.length<60&&!/(who|what|when|where|current|news|today)/i.test(t))return false;
+
+  // Search for ANYTHING about the real world, people, places, events, or time
+  // Don't search only for pure abstract/philosophical questions with no real-world entity
+  var hasEntity=/[A-Z][a-z]+/.test(t);  // has a proper noun
+  var hasTimeRef=/(today|now|currently|this (year|month|week)|2024|2025|2026|latest|recent|new|just|last (week|month|year)|yesterday)/i.test(t);
+  var hasWh=/(who|what('s)?|where|when|how (much|many|is|are|does|did)|is (there|it|he|she|they)|are (they|there))/i.test(t);
+  var hasWorld=/(country|city|nation|government|president|minister|leader|company|brand|team|player|movie|show|song|album|book|person|people)/i.test(t);
+
+  // If it's a "what/who/where" question about real things, or mentions current time → search
+  if(hasTimeRef)return true;
+  if(hasWh&&(hasEntity||hasWorld))return true;
+  if(hasEntity&&t.split(' ').length>=3)return true;  // "Israel Gaza" etc — has proper nouns
+
+  // Catch-all patterns
+  if(/(news|headline|happening|going on|situation|update|latest|status|result|score|price|rate|weather|forecast|election|war|conflict|attack|deal|agreement|law|policy|bill|court|trial|arrest|died|dead|killed|born|married|fired|hired|launched|released|announced|won|lost)/i.test(t))return true;
+
   return false;
 }
 var SESSION_DUR=0;
@@ -2459,14 +2467,14 @@ function getModeSystem(mode, chatSysPrompt, searchContext) {
   else if(_srContext==='health'){specialistStr='\nHEALTH: Always recommend consulting a qualified doctor. Provide accurate general information only.';}
 
   var searchStr=searchContext
-    ? '\n\n[LIVE DATA — overrides training knowledge]\n'+searchContext+'\nCite [Source] labels inline when using this data. Use data above as primary truth.\n'
+    ? '\n\n[LIVE SEARCH DATA — current as of '+new Date().toDateString()+']\n'+searchContext+'\nThis is REAL-TIME data from the web. It OVERRIDES your training knowledge. Always prefer this data. Cite sources inline as [Source]. If the data answers the question, lead with it directly — do not say you cannot access the internet.\n'
     : '';
 
   var custom=chatSysPrompt||_settings.customSysPrompt||'';
 
   // ── CORE SYSTEM PROMPT ────────────────────────────────────────────────
   var core =
-'You are NexoGPT — the most useful AI assistant ever built. Today: '+d+'.\n'+
+'You are NexoGPT — the most useful AI assistant ever built.\nToday\'s date: '+d+'. Year: '+now.getFullYear()+'.\nIMPORTANT: You are operating in '+now.getFullYear()+'. Do NOT say your knowledge ends in 2023 or 2024. When users ask about current events or today\'s date, the year is '+now.getFullYear()+'.\n'+
 langRule+personaStr+levelStr+memStr+pmStr+specialistStr+searchStr+'\n\n'+
 
 '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'+
@@ -2708,16 +2716,29 @@ function isGibberish(text){
 }
 
 function shouldSearch(text){
-  if(!text||text.trim().length<=6)return false;
+  if(!text||text.trim().length<=4)return false;
   var t=text.trim();
-  if(TRIVIAL_RE.test(t)||CODE_RE.test(t)||MATH_RE.test(t)||CREATIVE_RE.test(t))return false;
-  if(/\b(weather|temperature|forecast|bitcoin|ethereum|crypto|stock price|exchange rate|currency)\b/i.test(t))return true;
-  // investing.com context
-  if(SEARCH_CONTEXTS['investing']&&SEARCH_CONTEXTS['investing'].detect.test(t))return true;
-  if(/\b(who is (the )?(current|new|latest)|capital of|population of|president of|ceo of|prime minister of)\b/i.test(t))return true;
-  if(/\b(news|headlines|what happened|breaking|latest update)\b/i.test(t))return true;
-  if(/\b(what time is it in|current time in|time in)\b/i.test(t))return true;
-  if(/חדשות|מה קורה היום|עדכונים/i.test(t))return true;
+  // Never search for pure code, math, creative writing, or greetings
+  if(TRIVIAL_RE.test(t))return false;
+  if(CODE_RE.test(t)&&!/(news|latest|update|current|2026|today|who|what happened|going on)/i.test(t))return false;
+  if(MATH_RE.test(t)&&!/(who|what|when|where|current|latest|today)/i.test(t))return false;
+  if(CREATIVE_RE.test(t)&&t.length<60&&!/(who|what|when|where|current|news|today)/i.test(t))return false;
+
+  // Search for ANYTHING about the real world, people, places, events, or time
+  // Don't search only for pure abstract/philosophical questions with no real-world entity
+  var hasEntity=/[A-Z][a-z]+/.test(t);  // has a proper noun
+  var hasTimeRef=/(today|now|currently|this (year|month|week)|2024|2025|2026|latest|recent|new|just|last (week|month|year)|yesterday)/i.test(t);
+  var hasWh=/(who|what('s)?|where|when|how (much|many|is|are|does|did)|is (there|it|he|she|they)|are (they|there))/i.test(t);
+  var hasWorld=/(country|city|nation|government|president|minister|leader|company|brand|team|player|movie|show|song|album|book|person|people)/i.test(t);
+
+  // If it's a "what/who/where" question about real things, or mentions current time → search
+  if(hasTimeRef)return true;
+  if(hasWh&&(hasEntity||hasWorld))return true;
+  if(hasEntity&&t.split(' ').length>=3)return true;  // "Israel Gaza" etc — has proper nouns
+
+  // Catch-all patterns
+  if(/(news|headline|happening|going on|situation|update|latest|status|result|score|price|rate|weather|forecast|election|war|conflict|attack|deal|agreement|law|policy|bill|court|trial|arrest|died|dead|killed|born|married|fired|hired|launched|released|announced|won|lost)/i.test(t))return true;
+
   return false;
 }
 
@@ -2789,6 +2810,234 @@ function _simpleRow(m){var row=document.createElement('div');row.className='mrow
 function _asstRow(m){var row=document.createElement('div');row.className='mrow asst';var ar=document.createElement('div');ar.className='ai-row';ar.appendChild(makeAiAvatar());var body=document.createElement('div');body.className='ai-body';var c=m.content||'';if(!c){body.innerHTML='<div class="typ-dots"><div class="typ-dot"></div><div class="typ-dot"></div><div class="typ-dot"></div></div>';}else if(c.startsWith('__ERR__')){body.innerHTML='<div class="err-msg">'+escHtml(c.slice(7))+'</div>';}else{try{body.innerHTML=parseMd(c.trim());}catch(e){body.textContent=c;}}ar.appendChild(body);row.appendChild(ar);var act=document.createElement('div');act.className='mact';act.style.paddingLeft='40px';var cp=document.createElement('button');cp.className='mact-btn';cp.textContent='Copy';cp.addEventListener('click',function(){copyText(body.innerText,cp);});act.appendChild(cp);row.appendChild(act);return row;}
 function scrollEnd(){var w=document.getElementById('msg-wrap');if(w)requestAnimationFrame(function(){w.scrollTo({top:w.scrollHeight,behavior:'smooth'});});}
 function updateSendBtn(){var btn=document.getElementById('send-btn'),si=document.getElementById('send-icon'),sti=document.getElementById('stop-icon');if(!btn)return;if(S.busy){btn.disabled=false;btn.classList.add('stop-mode');if(si)si.style.display='none';if(sti)sti.style.display='block';}else{var ta=document.getElementById('msg-in');btn.disabled=!(ta&&ta.value.trim())&&!S.vids.length&&!S.imgs.length&&!S.texts.length&&!S.pdfs.length;btn.classList.remove('stop-mode');if(si)si.style.display='block';if(sti)sti.style.display='none';}}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  realWebSearch — topic-aware search using the right trusted sources
+// ═══════════════════════════════════════════════════════════════════════
+async function realWebSearch(query) {
+  var year = new Date().getFullYear();
+  var trimQ = query.trim();
+  var searchQ = /\d{4}/.test(trimQ) ? trimQ : trimQ + ' ' + year;
+  var corsProxy = 'https://api.allorigins.win/get?url=';
+
+  // ── Topic detection → pick the right source set ─────────────────────
+  var TOPICS = {
+    football: {
+      detect: /\b(football|soccer|premier league|la liga|serie a|bundesliga|ligue 1|champions league|europa league|world cup|euro|copa|mls|efl|fa cup|transfer|lineup|squad|goal|match|fixture|standing|table|player|manager|club|team|liverpool|chelsea|arsenal|manchester|barcelona|real madrid|psg|juventus|bayern|dortmund|atletico|inter|milan|napoli|celtic|rangers|ajax|benfica|porto|messi|ronaldo|mbappe|haaland|salah|kane)\b/i,
+      feeds: [
+        {url:'https://feeds.bbci.co.uk/sport/football/rss.xml', name:'BBC Sport Football'},
+        {url:'https://www.espn.com/espn/rss/soccer/news', name:'ESPN Soccer'},
+        {url:'https://www.goal.com/feeds/en/news', name:'Goal.com'},
+        {url:'https://www.skysports.com/rss/12040', name:'Sky Sports Football'}
+      ],
+      domains: ['bbc.com/sport','espn.com','goal.com','skysports.com','transfermarkt.com','sofascore.com','flashscore.com','whoscored.com','fotmob.com','fbref.com']
+    },
+    sports: {
+      detect: /\b(nba|nfl|nhl|mlb|nba|wnba|tennis|golf|formula 1|f1|ufc|boxing|cricket|rugby|olympics|score|match|game|championship|tournament|playoff|draft|trade|injury|roster)\b/i,
+      feeds: [
+        {url:'https://www.espn.com/espn/rss/news', name:'ESPN'},
+        {url:'https://feeds.bbci.co.uk/sport/rss.xml', name:'BBC Sport'},
+        {url:'https://www.skysports.com/rss/12040', name:'Sky Sports'}
+      ],
+      domains: ['espn.com','bbc.com/sport','skysports.com','sports.yahoo.com','bleacherreport.com','cbssports.com','nba.com','nfl.com']
+    },
+    investing: {
+      detect: /\b(stock|invest|market|share|portfolio|dividend|etf|mutual fund|hedge fund|s&p|dow jones|nasdaq|nyse|ftse|dax|nikkei|trading|trader|bull|bear|short|long|options|futures|bonds|yield|earnings|revenue|quarterly|ipo|valuation|pe ratio|fundamental|technical analysis|chart|candlestick|support|resistance|moving average)\b/i,
+      feeds: [
+        {url:'https://feeds.bloomberg.com/markets/news.rss', name:'Bloomberg Markets'},
+        {url:'https://feeds.reuters.com/reuters/businessNews', name:'Reuters Business'},
+        {url:'https://www.marketwatch.com/rss/topstories', name:'MarketWatch'},
+        {url:'https://seekingalpha.com/feed.xml', name:'Seeking Alpha'}
+      ],
+      domains: ['bloomberg.com','reuters.com','marketwatch.com','seekingalpha.com','wsj.com','ft.com','cnbc.com','fool.com','finance.yahoo.com','investing.com','barrons.com']
+    },
+    crypto: {
+      detect: /\b(bitcoin|btc|ethereum|eth|crypto|cryptocurrency|altcoin|defi|nft|blockchain|solana|cardano|xrp|ripple|dogecoin|binance|coinbase|wallet|token|web3|metaverse|staking|mining|halving|mempool|gas fee|satoshi)\b/i,
+      feeds: [
+        {url:'https://cointelegraph.com/rss', name:'CoinTelegraph'},
+        {url:'https://coindesk.com/arc/outboundfeeds/rss/', name:'CoinDesk'},
+        {url:'https://decrypt.co/feed', name:'Decrypt'}
+      ],
+      domains: ['cointelegraph.com','coindesk.com','decrypt.co','coingecko.com','coinmarketcap.com','binance.com','cryptonews.com','theblock.co']
+    },
+    tech: {
+      detect: /\b(apple|google|microsoft|meta|amazon|nvidia|tesla|openai|anthropic|samsung|sony|intel|amd|spacex|elon musk|tim cook|sundar pichai|satya nadella|ai model|llm|gpt|gemini|claude|chatgpt|iphone|android|chip|semiconductor|startup|silicon valley|vc|venture|funding|acquisition|merger|ipo|tech)\b/i,
+      feeds: [
+        {url:'https://feeds.feedburner.com/TechCrunch/', name:'TechCrunch'},
+        {url:'https://www.theverge.com/rss/index.xml', name:'The Verge'},
+        {url:'https://feeds.wired.com/wired/index', name:'Wired'},
+        {url:'https://www.cnet.com/rss/news/', name:'CNET'}
+      ],
+      domains: ['techcrunch.com','theverge.com','wired.com','cnet.com','arstechnica.com','engadget.com','9to5mac.com','macrumors.com','androidauthority.com','venturebeat.com']
+    },
+    finance: {
+      detect: /\b(gdp|inflation|interest rate|federal reserve|fed|central bank|ecb|imf|world bank|recession|unemployment|cpi|ppi|monetary policy|fiscal|budget|deficit|debt|currency|dollar|euro|pound|yen|forex|exchange rate|oil price|gold|commodity)\b/i,
+      feeds: [
+        {url:'https://feeds.reuters.com/reuters/businessNews', name:'Reuters Business'},
+        {url:'https://feeds.bloomberg.com/economics/news.rss', name:'Bloomberg Economics'},
+        {url:'https://www.ft.com/rss/home', name:'Financial Times'}
+      ],
+      domains: ['reuters.com','bloomberg.com','ft.com','wsj.com','cnbc.com','economist.com','imf.org','federalreserve.gov','ecb.europa.eu']
+    },
+    health: {
+      detect: /\b(health|medical|medicine|disease|virus|vaccine|treatment|drug|fda|who|cdc|hospital|doctor|cancer|diabetes|mental health|covid|pandemic|epidemic|clinical trial|surgery|therapy|nutrition|diet|exercise|study|research paper)\b/i,
+      feeds: [
+        {url:'https://rss.medicalnewstoday.com/featurednews.xml', name:'Medical News Today'},
+        {url:'https://feeds.bbci.co.uk/news/health/rss.xml', name:'BBC Health'},
+        {url:'https://www.nejm.org/action/showFeed?jc=nejmoa&type=etoc&feed=rss', name:'NEJM'}
+      ],
+      domains: ['who.int','cdc.gov','nih.gov','mayoclinic.org','medicalnewstoday.com','healthline.com','webmd.com','nejm.org','thelancet.com','bmj.com']
+    },
+    science: {
+      detect: /\b(science|nasa|space|planet|star|galaxy|black hole|quantum|physics|chemistry|biology|dna|gene|climate|environment|earthquake|volcano|discovery|experiment|research|study|published|journal|paper)\b/i,
+      feeds: [
+        {url:'https://www.nasa.gov/rss/dyn/breaking_news.rss', name:'NASA'},
+        {url:'https://feeds.bbci.co.uk/news/science_and_environment/rss.xml', name:'BBC Science'},
+        {url:'https://www.newscientist.com/feed/home/', name:'New Scientist'}
+      ],
+      domains: ['nasa.gov','nature.com','science.org','newscientist.com','scientificamerican.com','arxiv.org','nationalgeographic.com','space.com','phys.org']
+    },
+    politics: {
+      detect: /\b(election|vote|president|prime minister|congress|senate|parliament|government|party|democrat|republican|labour|conservative|policy|legislation|law|bill|supreme court|white house|kremlin|biden|trump|putin|xi|macron|modi|netanyahu|starmer|nato|un|eu|g7|g20|sanction|diplomat|treaty|summit)\b/i,
+      feeds: [
+        {url:'https://feeds.bbci.co.uk/news/politics/rss.xml', name:'BBC Politics'},
+        {url:'https://feeds.reuters.com/Reuters/PoliticsNews', name:'Reuters Politics'},
+        {url:'https://apnews.com/apf-politics.rss', name:'AP Politics'},
+        {url:'https://www.politico.com/rss/politicopicks.xml', name:'Politico'}
+      ],
+      domains: ['bbc.com','reuters.com','apnews.com','politico.com','theguardian.com','nytimes.com','washingtonpost.com','axios.com','thehill.com','rollcall.com']
+    },
+    entertainment: {
+      detect: /\b(movie|film|series|show|netflix|disney|hbo|amazon prime|apple tv|episode|season|trailer|actor|actress|director|celebrity|music|album|song|artist|singer|grammy|oscar|emmy|golden globe|box office|streaming|release|premiere)\b/i,
+      feeds: [
+        {url:'https://variety.com/feed/', name:'Variety'},
+        {url:'https://deadline.com/feed/', name:'Deadline Hollywood'},
+        {url:'https://www.hollywoodreporter.com/feed/', name:'Hollywood Reporter'}
+      ],
+      domains: ['variety.com','deadline.com','hollywoodreporter.com','imdb.com','rottentomatoes.com','metacritic.com','indiewire.com','billboard.com','rollingstone.com']
+    },
+    general_news: {
+      detect: /./,  // fallback — matches everything
+      feeds: [
+        {url:'https://feeds.bbci.co.uk/news/world/rss.xml', name:'BBC World'},
+        {url:'https://feeds.reuters.com/reuters/topNews', name:'Reuters'},
+        {url:'https://apnews.com/apf-topnews.rss', name:'AP News'},
+        {url:'https://feeds.theguardian.com/theguardian/world/rss', name:'The Guardian'}
+      ],
+      domains: ['bbc.com','reuters.com','apnews.com','theguardian.com','cnn.com','nytimes.com','washingtonpost.com','aljazeera.com','dw.com','france24.com']
+    }
+  };
+
+  // Detect topic (try all in priority order, fallback to general_news)
+  var topicKey = 'general_news';
+  var topicOrder = ['football','sports','crypto','investing','finance','tech','health','science','politics','entertainment'];
+  for (var ti = 0; ti < topicOrder.length; ti++) {
+    if (TOPICS[topicOrder[ti]].detect.test(trimQ)) {
+      topicKey = topicOrder[ti];
+      break;
+    }
+  }
+  var topic = TOPICS[topicKey];
+
+  S.searchPhase = 'searching';
+  S.searchQuery = trimQ;
+  S.searchDomains = topic.domains.slice(0, 6);
+  drawMsgs();
+
+  var results = [];
+  var usedDomains = [];
+
+  // ── 1. DuckDuckGo Instant Answer ──────────────────────────────────────
+  try {
+    var ddgRes = await fetch('https://api.duckduckgo.com/?q=' + encodeURIComponent(searchQ) + '&format=json&no_html=1&skip_disambig=1&t=nexogpt', {signal: AbortSignal.timeout(5000)});
+    if (ddgRes.ok) {
+      var ddg = await ddgRes.json();
+      if (ddg.AbstractText && ddg.AbstractText.length > 40) {
+        results.push('[' + (ddg.AbstractSource || 'DuckDuckGo') + '] ' + ddg.AbstractText);
+        usedDomains.push((ddg.AbstractSource||'duckduckgo').toLowerCase().replace(/\s/g,'') + '.com');
+      }
+      if (ddg.Answer) results.push('[Instant Answer] ' + ddg.Answer);
+      if (ddg.Infobox && ddg.Infobox.content) {
+        ddg.Infobox.content.slice(0, 6).forEach(function(item) {
+          if (item.label && item.value) results.push(item.label + ': ' + item.value);
+        });
+      }
+      if (ddg.RelatedTopics) {
+        ddg.RelatedTopics.slice(0, 3).forEach(function(t) {
+          if (t.Text && t.Text.length > 20) results.push('[Related] ' + t.Text);
+        });
+      }
+    }
+  } catch(e) {}
+
+  // ── 2. Topic-specific RSS feeds ───────────────────────────────────────
+  var qWords = trimQ.toLowerCase().split(/\s+/).filter(function(w){ return w.length > 3; });
+  var feedsToFetch = topic.feeds.slice(0, 3);
+
+  var feedPromises = feedsToFetch.map(async function(feed) {
+    try {
+      var r = await fetch(corsProxy + encodeURIComponent(feed.url), {signal: AbortSignal.timeout(7000)});
+      if (!r.ok) return;
+      var data = await r.json();
+      var xml = data.contents || '';
+      var items = xml.match(/<item>[\s\S]*?<\/item>/g) || [];
+      var added = 0;
+      items.slice(0, 25).forEach(function(item) {
+        if (added >= 5) return;
+        var title = (item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/) || item.match(/<title>(.*?)<\/title>/) || [])[1] || '';
+        var desc  = (item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/) || item.match(/<description>(.*?)<\/description>/) || [])[1] || '';
+        var pubDate = (item.match(/<pubDate>(.*?)<\/pubDate>/) || [])[1] || '';
+        title = title.replace(/<[^>]+>/g, '').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').trim();
+        desc = desc.replace(/<[^>]+>/g, '').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').trim().slice(0, 250);
+        if (!title) return;
+        // Score: how relevant is this item to the query?
+        var score = qWords.reduce(function(s, w) {
+          return s + (title.toLowerCase().includes(w) ? 2 : 0) + (desc.toLowerCase().includes(w) ? 1 : 0);
+        }, 0);
+        // For topic-specific feeds, include top items even without keyword match
+        if (score > 0 || added < 3) {
+          var entry = '[' + feed.name + '] ' + title;
+          if (desc) entry += ' — ' + desc;
+          if (pubDate) entry += ' (' + pubDate.slice(0, 16) + ')';
+          results.push(entry);
+          added++;
+          var domain = feed.url.match(/https?:\/\/([^\/]+)/);
+          if (domain && !usedDomains.includes(domain[1])) usedDomains.push(domain[1]);
+        }
+      });
+    } catch(e) {}
+  });
+
+  await Promise.allSettled(feedPromises);
+
+  // ── 3. Wikipedia background context ───────────────────────────────────
+  try {
+    var wikiQ = trimQ.replace(/\b(what is|who is|tell me about|explain|how does|find me|show me|latest on)\b/gi, '').trim();
+    if (wikiQ.length > 3) {
+      var wikiRes = await fetch('https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(wikiQ), {signal: AbortSignal.timeout(4000)});
+      if (wikiRes.ok) {
+        var wiki = await wikiRes.json();
+        if (wiki.extract && wiki.extract.length > 80 && !wiki.extract.includes('may refer to')) {
+          results.push('[Wikipedia] ' + wiki.extract.slice(0, 600));
+          usedDomains.push('wikipedia.org');
+        }
+      }
+    }
+  } catch(e) {}
+
+  S.searchPhase = 'synthesizing';
+  S.searchDomains = (usedDomains.length ? usedDomains : topic.domains).slice(0, 8);
+  drawMsgs();
+  await new Promise(function(r) { setTimeout(r, 300); });
+
+  var now = new Date();
+  var context = results.length
+    ? 'LIVE SEARCH — Topic: ' + topicKey.toUpperCase() + ' | Sources: ' + S.searchDomains.join(', ') + '\nFetched: ' + now.toUTCString() + '\n\n' + results.slice(0, 20).join('\n\n')
+    : null;
+
+  return { context: context, query: trimQ, domains: S.searchDomains, searchContext: topicKey };
+}
+
 async function sendMsg(){if(S.busy)return;if(!rlCheck())return;var ta=document.getElementById('msg-in');var text=ta?ta.value.trim():'';if(!text&&!S.vids.length&&!S.imgs.length&&!S.texts.length&&!S.pdfs.length)return;var p=PLANS[S.plan]||PLANS.free;if(p.limit<999999&&S.used>=p.limit){showToast('Daily limit reached. Upgrade for more.');return;}var qType=classifyQuery(text);if(_settings.autoRoute&&text&&qType!=='trivial'){var am=autoMode(qType);if(am!==S.mode){S.mode=am;MODES.forEach(function(m){if(m.id===S.mode){var ml=document.getElementById('mode-lbl');if(ml)ml.textContent=m.name;}});}}if(S.texts.length){var tb2=S.texts.map(function(tx){return tx.content;}).join('\n\n---\n\n');text=text?(tb2+'\n\n'+text):tb2;}var isNewChat=!S.cid;if(isNewChat){var id=Date.now().toString();S.chats.unshift({id:id,title:(text||'Attachment').slice(0,48),msgs:[],folder:_settings.defaultFolder||null});S.cid=id;}var userMsg={role:'user',content:text};if(S.vids.length)userMsg.vids=S.vids.slice();if(S.imgs.length)userMsg.imgs=S.imgs.slice();if(S.pdfs.length)userMsg.pdfs=S.pdfs.slice();S.msgs.push(userMsg);if(userMsg.content)updateMemory(userMsg.content);if(ta){ta.value='';ta.style.height='auto';}S.vids=[];S.imgs=[];S.texts=[];S.pdfs=[];var aa=document.getElementById('att-area');if(aa){aa.innerHTML='';aa.classList.remove('on');}document.getElementById('token-counter').style.display='none';
 // Image detection — must explicitly mention image/photo/picture/art/etc.
   // NEVER trigger on code/web/app/site/html requests
@@ -2815,7 +3064,7 @@ var searchCtx=null;var usedSearch=false;var searchQuery='';
     try{document.getElementById('msg-in').focus();}catch(e){}
     return;
   }
-  var doSearch=text&&shouldSearch(text)&&S.mode!=='fast';
+  var doSearch=text&&shouldSearch(text); // always search for current events regardless of mode
 if(doSearch){
   S.busy=true;updateSendBtn();
   // Render user message immediately so user sees it
@@ -3134,18 +3383,31 @@ var _googleUser = null;
   if (!stored || auth !== '1') return;
   try {
     _googleUser = JSON.parse(stored);
-    document.addEventListener('DOMContentLoaded', function() {
-      var loginEl = document.getElementById('screen-login');
-      var chatEl  = document.getElementById('screen-chat');
-      if (loginEl) { loginEl.classList.remove('on'); loginEl.style.display='none'; }
-      if (chatEl)  { chatEl.style.display='flex'; chatEl.classList.add('on'); }
-      setTimeout(function() {
-        try { if (typeof renderChatList==='function') renderChatList(); } catch(e){}
-        try { if (typeof renderSidebarUser==='function') renderSidebarUser(); } catch(e){}
-        try { if (typeof initApp==='function') initApp(); } catch(e){}
-      }, 200);
-    });
-  } catch(e) { localStorage.removeItem('ngpt_google_user'); }
+    // Also restore user email into S if not set (needed for boot())
+    if (_googleUser && _googleUser.email) {
+      localStorage.setItem('ngpt_user', _googleUser.email);
+    }
+  } catch(e) { localStorage.removeItem('ngpt_google_user'); return; }
+
+  function _applyAutoLogin() {
+    var loginEl = document.getElementById('screen-login');
+    var chatEl  = document.getElementById('screen-chat');
+    if (!loginEl && !chatEl) return; // DOM not ready yet
+    if (loginEl) { loginEl.classList.remove('on'); loginEl.style.display='none'; }
+    if (chatEl)  { chatEl.style.display='flex'; chatEl.classList.add('on'); }
+    setTimeout(function() {
+      try { if (typeof renderChatList==='function') renderChatList(); } catch(e){}
+      try { if (typeof updateSidebarUser==='function') updateSidebarUser(); } catch(e){}
+      try { if (typeof boot==='function') {} } catch(e){} // boot handles it
+    }, 150);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _applyAutoLogin);
+  } else {
+    // DOM already ready (script ran late)
+    setTimeout(_applyAutoLogin, 0);
+  }
 })();
 
 function initGoogleAuth() {
@@ -3166,15 +3428,15 @@ function initGoogleAuth() {
 
 function doGoogleSignIn() {
   // Build Google OAuth URL — opens a real popup window, no cookies needed
-  // Always use the root domain as redirect — must match Google Console exactly
-  var redirectUri = 'https://nexodashboard.org/';
+  // Use access_token flow only — simpler, no nonce needed, easier to register
+  var redirectUri = window.location.origin + (window.location.pathname === '/' ? '/' : window.location.pathname);
   var params = new URLSearchParams({
     client_id    : GOOGLE_CLIENT_ID,
     redirect_uri : redirectUri,
-    response_type: 'token id_token',
+    response_type: 'token',
     scope        : 'openid email profile',
-    nonce        : Math.random().toString(36).slice(2),
-    prompt       : 'select_account'
+    prompt       : 'select_account',
+    include_granted_scopes: 'true'
   });
   var authUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' + params.toString();
 
