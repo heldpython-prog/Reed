@@ -588,13 +588,32 @@ input,select,textarea,button{font-family:'Inter','Google Sans','Roboto','Segoe U
 .m-name,.m-desc,.mode-name,.mode-desc,.prompt-card-title,.prompt-card-text{font-family:'Inter','Google Sans','Roboto','Segoe UI',system-ui,Arial,sans-serif}
 .setting-label,.shortcut-desc,.usage-stat-label{font-family:'Inter','Google Sans','Roboto','Segoe UI',system-ui,Arial,sans-serif}
 </style>
-<style>pre code{display:block;overflow-x:auto;padding:1em;background:#161b22;color:#e6edf3;font-family:monospace;font-size:13px;border-radius:6px;}</style>
+<style>
+pre code{display:block;overflow-x:auto;padding:1em;background:#0d1117;color:#e6edf3;font-family:'Monaco','Menlo',monospace;font-size:12.5px;line-height:1.7;border-radius:6px}
+.hljs-keyword,.hljs-selector-tag{color:#ff7b72}.hljs-string,.hljs-addition{color:#a5d6ff}
+.hljs-comment{color:#8b949e;font-style:italic}.hljs-number,.hljs-literal{color:#ffa657}
+.hljs-title,.hljs-section{color:#79c0ff}.hljs-attribute,.hljs-variable{color:#ffa657}
+.hljs-built_in,.hljs-type{color:#ffa657}.hljs-meta{color:#8b949e}
+</style>
 <script>
-window.hljs=window.hljs||{highlight:function(c,o){return{value:c.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')};},highlightAuto:function(c){return{value:c.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')};},getLanguage:function(){return true;},highlightElement:function(){}};
+window.hljs=window.hljs||{
+  highlight:function(c,o){return{value:c.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')};},
+  highlightAuto:function(c){return{value:c.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')};},
+  getLanguage:function(){return true;},
+  highlightElement:function(){}
+};
 window.pdfjsLib=window.pdfjsLib||null;
-window.addEventListener('load',function(){
-  var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js';s.async=true;document.head.appendChild(s);
-  var p=document.createElement('script');p.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';p.async=true;document.head.appendChild(p);
+// Load real hljs + pdfjs after page is interactive - won't block anything
+document.addEventListener('DOMContentLoaded',function(){
+  [
+    'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'
+  ].forEach(function(src){
+    var s=document.createElement('script');s.src=src;s.async=true;document.head.appendChild(s);
+  });
+  var css=document.createElement('link');css.rel='stylesheet';
+  css.href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css';
+  document.head.appendChild(css);
 });
 </script>
 </head>
