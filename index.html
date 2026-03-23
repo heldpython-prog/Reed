@@ -588,36 +588,11 @@ input,select,textarea,button{font-family:'Inter','Google Sans','Roboto','Segoe U
 .m-name,.m-desc,.mode-name,.mode-desc,.prompt-card-title,.prompt-card-text{font-family:'Inter','Google Sans','Roboto','Segoe UI',system-ui,Arial,sans-serif}
 .setting-label,.shortcut-desc,.usage-stat-label{font-family:'Inter','Google Sans','Roboto','Segoe UI',system-ui,Arial,sans-serif}
 </style>
-<style>
-pre code{display:block;overflow-x:auto;padding:1em;background:#0d1117;color:#e6edf3;font-family:'Monaco','Menlo',monospace;font-size:12.5px;line-height:1.7;border-radius:6px}
-.hljs-keyword,.hljs-selector-tag{color:#ff7b72}.hljs-string,.hljs-addition{color:#a5d6ff}
-.hljs-comment{color:#8b949e;font-style:italic}.hljs-number,.hljs-literal{color:#ffa657}
-.hljs-title,.hljs-section{color:#79c0ff}.hljs-attribute,.hljs-variable{color:#ffa657}
-.hljs-built_in,.hljs-type{color:#ffa657}.hljs-meta{color:#8b949e}
-</style>
-<script>
-window.hljs=window.hljs||{
-  highlight:function(c,o){return{value:c.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')};},
-  highlightAuto:function(c){return{value:c.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')};},
-  getLanguage:function(){return true;},
-  highlightElement:function(){}
-};
-window.pdfjsLib=window.pdfjsLib||null;
-// Load real hljs + pdfjs after page is interactive - won't block anything
-document.addEventListener('DOMContentLoaded',function(){
-  [
-    'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js',
-    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'
-  ].forEach(function(src){
-    var s=document.createElement('script');s.src=src;s.async=true;document.head.appendChild(s);
-  });
-  var css=document.createElement('link');css.rel='stylesheet';
-  css.href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css';
-  document.head.appendChild(css);
-});
-</script>
+<style>pre code{display:block;overflow-x:auto;padding:1em;background:#0d1117;color:#e6edf3;font-family:monospace;font-size:12.5px;line-height:1.7;border-radius:6px}.hljs-keyword{color:#ff7b72}.hljs-string{color:#a5d6ff}.hljs-comment{color:#8b949e}.hljs-number{color:#ffa657}.hljs-title{color:#79c0ff}</style>
+<script>window.hljs=window.hljs||{highlight:function(c,o){return{value:c.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')};},highlightAuto:function(c){return{value:c.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')};},getLanguage:function(){return true;},highlightElement:function(){}};window.pdfjsLib=null;</script>
 </head>
 <body>
+<div id="LOADTEST" style="position:fixed;top:0;left:0;right:0;bottom:0;background:#0e0e0e;display:flex;align-items:center;justify-content:center;z-index:0;font-family:sans-serif"><div style="text-align:center;color:#555;font-size:15px">Loading NexoGPT…</div></div>
 
 <script>
 // Detect file:// protocol — fetch is blocked by browser in this mode
@@ -676,7 +651,7 @@ document.addEventListener('DOMContentLoaded',function(){
   <!-- DeepSeek section -->
   <div style="margin-bottom:18px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div><div style="font-size:13px;font-weight:700;color:var(--t1)">DeepSeek <span style="font-size:10px;font-weight:600;color:#2563eb;background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.2);padding:2px 8px;border-radius:4px;margin-left:6px">Powerful</span></div><div style="font-size:11px;color:var(--t3);margin-top:2px">DeepSeek Chat · <a href="https://platform.deepseek.com/api_keys" target="_blank" style="color:var(--a)">Get key →</a></div></div><span id="deepseek-key-count" style="font-size:11px;color:var(--a);font-weight:600"></span></div><div style="display:flex;gap:8px"><input id="deepseek-key-in" type="password" placeholder="sk-..." style="flex:1;background:var(--s2);border:1px solid var(--bd2);border-radius:var(--r-sm);color:var(--t1);font-size:13px;padding:9px 12px;outline:none;font-family:monospace" autocomplete="off"/><button onclick="addKeyFromInput('deepseek','deepseek-key-in')" style="padding:9px 16px;border-radius:var(--r-sm);border:none;background:var(--a);color:#ffffff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">Add</button></div><div id="deepseek-keys-list" style="margin-top:8px"></div></div>
 </div><div class="modal-footer"><button class="modal-btn primary" onclick="closeModal('modal-apikeys')">Done</button></div></div></div>
-<div id="screen-login" class="screen vcenter on">
+<div id="screen-login" class="screen vcenter on" style="display:flex!important;position:relative;z-index:1">
   <div class="lw"><div class="lcard">
     <div class="lhero"><div class="l-logo"><svg width="28" height="28" viewBox="0 0 24 24"><g transform="rotate(45 12 12)"><path d="M12 2c0 0-.8 4.2-3.2 6.8C6.2 11.2 2 12 2 12s4.2.8 6.8 3.2C11.2 17.8 12 22 12 22s.8-4.2 3.2-6.8C17.8 12.8 22 12 22 12s-4.2-.8-6.8-3.2C12.8 6.2 12 2 12 2z" fill="#475569"/></g></svg></div><div class="l-brand">NexoGPT</div><div class="l-sub"></div>
     <div class="lbody">
@@ -880,6 +855,8 @@ document.addEventListener('DOMContentLoaded',function(){
 
 
 <script>
+try{
+
 /* devtools protection removed */
 (function(){var a=[];var h='';if(false){if(false){document.addEventListener('DOMContentLoaded',function(){document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0f0f0f;color:#ef4444;font-family:monospace;font-size:13px;flex-direction:column;gap:10px"><div style="font-size:28px">&#128274;</div><div>Unauthorized domain.</div></div>';});window.getApiKey=function(){return '';};}}})();
 document.addEventListener('selectstart',function(e){var el=e.target;if(el.tagName==='TEXTAREA'||el.tagName==='INPUT')return true;while(el){if(el.classList&&(el.classList.contains('ai-body')||el.classList.contains('ubub')||el.classList.contains('kv'))){return true;}el=el.parentElement;}e.preventDefault();return false;},false);
@@ -2218,7 +2195,7 @@ var isPremium=(S.plan==='empire'||S.plan==='dev'||localStorage.getItem('ngpt_isd
 if(upgBtn)upgBtn.style.display=isPremium?'none':'flex';
 var isDev=S.plan==='dev'||localStorage.getItem('ngpt_isdev')==='1';if(isDev&&!document.getElementById('sb-nav-dev')){var d=document.createElement('button');d.className='sb-nav-btn';d.id='sb-nav-dev';d.style.cssText='color:#f97316;background:rgba(249,115,22,.06)';d.innerHTML='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="1.8" stroke-linecap="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Developer';d.addEventListener('click',function(){go('dev');});var nav=document.querySelector('.sb-nav');if(nav)nav.insertBefore(d,nav.firstChild);}
 updateSidebarUser();updateChatPromptBadge();drawMsgs();}
-if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",boot);}else{boot();}
+try{if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",boot);}else{boot();}}catch(_be){document.getElementById("LOADTEST")&&(document.getElementById("LOADTEST").innerHTML='<pre style="color:#f87171;padding:20px">boot() error: '+_be+'\n'+(_be.stack||'')+'</pre>');}
 
 /* ─── UNIVERSAL FILE ATTACHMENT ─────────────────────────────────────── */
 async function handleUniversalAttach(input){
@@ -2305,6 +2282,10 @@ function applySiteLang(lang){
 }
 // Apply saved site lang on load
 if(_settings.siteLang)applySiteLang(_settings.siteLang);
+
+}catch(_e){
+document.getElementById("LOADTEST")&&(document.getElementById("LOADTEST").innerHTML='<div style="background:#1a0808;border:1px solid #f87171;border-radius:12px;padding:24px;max-width:680px;margin:20px;font-family:monospace"><div style="color:#f87171;font-size:15px;font-weight:700;margin-bottom:12px">&#9888; JS Error</div><pre style="color:#fca5a5;font-size:11px;white-space:pre-wrap;margin:0;max-height:60vh;overflow:auto">'+String(_e)+'\n\n'+String(_e&&_e.stack||'')+'</pre></div>');
+}
 </script>
 
 <!-- Dark toggle button removed as requested -->
