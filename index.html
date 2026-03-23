@@ -10,9 +10,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
 <meta name="apple-mobile-web-app-title" content="NexoGPT"/>
 <link rel="manifest" href="data:application/json,{&quot;name&quot;:&quot;NexoGPT&quot;,&quot;short_name&quot;:&quot;NexoGPT&quot;,&quot;start_url&quot;:&quot;/&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;%23f0f4f9&quot;,&quot;theme_color&quot;:&quot;%23f0f4f9&quot;,&quot;icons&quot;:[{&quot;src&quot;:&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%231f2328'/%3E%3Cg transform='rotate(45 96 96)'%3E%3Cpath d='M96 16s-6 33-25 52-55 25-55 25 36 6 55 25 25 55 25 55 6-33 25-52 55-25 55-25-36-6-55-25-25-52-25-52z' fill='white'/%3E%3C/g%3E%3C/svg%3E&quot;,&quot;sizes&quot;:&quot;192x192&quot;,&quot;type&quot;:&quot;image/svg+xml&quot;}]}"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer crossorigin="anonymous"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer crossorigin="anonymous"></script>
+
+
+
 
 
 
@@ -588,6 +588,15 @@ input,select,textarea,button{font-family:'Inter','Google Sans','Roboto','Segoe U
 .m-name,.m-desc,.mode-name,.mode-desc,.prompt-card-title,.prompt-card-text{font-family:'Inter','Google Sans','Roboto','Segoe UI',system-ui,Arial,sans-serif}
 .setting-label,.shortcut-desc,.usage-stat-label{font-family:'Inter','Google Sans','Roboto','Segoe UI',system-ui,Arial,sans-serif}
 </style>
+<style>pre code{display:block;overflow-x:auto;padding:1em;background:#161b22;color:#e6edf3;font-family:monospace;font-size:13px;border-radius:6px;}</style>
+<script>
+window.hljs=window.hljs||{highlight:function(c,o){return{value:c.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')};},highlightAuto:function(c){return{value:c.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')};},getLanguage:function(){return true;},highlightElement:function(){}};
+window.pdfjsLib=window.pdfjsLib||null;
+window.addEventListener('load',function(){
+  var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js';s.async=true;document.head.appendChild(s);
+  var p=document.createElement('script');p.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';p.async=true;document.head.appendChild(p);
+});
+</script>
 </head>
 <body>
 
@@ -1292,51 +1301,18 @@ async function callAI(msgs, modelCfg, system, maxTok, onToken, onDone, onError) 
 }
 
 function getDefaultModelForProvider(prov){var defaults={groq:'llama-3.3-70b-versatile',gemini:'gemini-1.5-flash',openrouter:'meta-llama/llama-3.3-70b-instruct:free',deepseek:'deepseek-chat'};return defaults[prov]||null;}
-function buildOpenAIMsgs(msgs,system){var out=[{role:'system',content:system}];var stripped=stripOldImages(msgs);stripped.forEach(function(m){if(m.abSide==='B')return;if(m.role==='user'){var hasImg=m.imgs&&m.imgs.length;if(hasImg){var parts=[];if(m.content)parts.push({type:'text',text:m.content});m.imgs.forEach(function(im){parts.push({type:'image_url',image_url:{url:im.url}});});if(m.pdfs)m.pdfs.forEach(function(pdf){parts.push({type:'text',text:'[PDF: '+pdf.name+']\n'+pdf.text});});out.push({role:'user',content:parts});}else{var content=(m.content||'(empty)')+(m._domainHint||'');if(m.pdfs&&m.pdfs.length){content=m.pdfs.map(function(p){return '[PDF: '+p.name+']\n'+p.text;}).join('\n\n')+(m.content?'\n\n'+m.content:'');}out.push({role:'user',content:content.trim()});}}else if(m.role==='assistant'){var c=(m.content||'').trim();if(!c||/^__\w+__/.test(c))return;if(c.startsWith('__PAUSED__'))c=c.slice(9).trim()||'[paused]';out.push({role:'assistant',content:c});}});var cleaned=[out[0]];for(var i=1;i<out.length;i++){var last=cleaned[cleaned.length-1];if(last.role===out[i].role&&out[i].role!=='system'){if(typeof last.content==='string'&&typeof out[i].content==='string'){cleaned[cleaned.length-1]={role:last.role,content:last.content+'\n'+out[i].content};}else{cleaned.push(out[i]);}}else{cleaned.push(out[i]);}}while(cleaned.length>1&&cleaned[cleaned.length-1].role!=='user')cleaned.pop();return trimContextOpenAI(cleaned,90000);}
-function trimContextOpenAI(msgs,maxTok){if(!msgs||msgs.length<=1)return msgs;function est(ms){return ms.reduce(function(a,m){var t=typeof m.content==='string'?m.content:JSON.stringify(m.content||'');return a+Math.ceil(t.length/3.5);},0);}while(msgs.length>2&&est(msgs)>maxTok)msgs.splice(1,1);return msgs;}
+
+
 function buildRLHtml(msg){var inner=msg.replace('__RATELIMIT__','');var parts=inner.split('||');var text=parts[0]||'Rate limit reached.';var rt=parts[1]?parseInt(parts[1]):0;var resetStr=rt?fmtReset(rt):'shortly';return '<div class="ratelimit-msg"><div style="font-size:18px;flex-shrink:0"></div><div><strong>Rate Limited</strong><div>'+escHtml(text)+'</div><div class="rl-timer">Resets '+escHtml(resetStr)+'</div><div style="margin-top:8px;font-size:12px;color:var(--t2)">Tip: Add more free keys in <button onclick="openKeysModal()" style="background:none;border:none;color:var(--a);cursor:pointer;font-size:12px;padding:0;text-decoration:underline">Settings  API Keys</button> to avoid this.</div></div></div>';}
 var MODES=[{id:'standard',name:'Standard',desc:'Balanced quality',icon:'S'},{id:'fast',name:'Fast',desc:'Instant, concise',icon:'F'},{id:'think',name:'Think',desc:'Step-by-step logic',icon:'T'},{id:'creative',name:'Creative',desc:'Vivid & imaginative',icon:'C'},{id:'precise',name:'Precise',desc:'Fact-focused',icon:'P'}];
 var SDPOOL=['wikipedia.org','reuters.com','bbc.com','apnews.com','ynet.co.il','haaretz.co.il','timesofisrael.com','cnn.com','theguardian.com','techcrunch.com','stackoverflow.com','github.com'];
 
 
-function shouldSearch(text){
-  if(!text)return false;
-  var t=text.trim();
-  if(t.length<=6)return false;
-  if(TRIVIAL_RE.test(t)||CODE_RE.test(t)||MATH_RE.test(t)||CREATIVE_RE.test(t))return false;
-  // Check all context patterns
-  for(var key in SEARCH_CONTEXTS){
-    if(SEARCH_CONTEXTS[key].detect.test(t))return true;
-  }
-  // General live-data triggers
-  // investing.com context
-  if(SEARCH_CONTEXTS['investing']&&SEARCH_CONTEXTS['investing'].detect.test(t))return true;
-  if(/\b(who is (the )?(current|new|latest)|capital of|population of|president of|ceo of)\b/i.test(t))return true;
-  if(/\b(news|headlines|what happened|breaking|latest update)\b/i.test(t))return true;
-  if(/\b(what time is it in|current time in|time in)\b/i.test(t))return true;
-  if(/חדשות|מה קורה היום|עדכונים/i.test(t))return true;
-  return false;
-}
+
 var SESSION_DUR=0;
 
 // Detects random letters / gibberish that need instant clarification (no API call needed)
-function isGibberish(text){
-  var t=text.trim();
-  if(!t||t.length<2)return true;
-  if(t.length>40)return false; // Long messages are never gibberish
-  // Allow known short words and abbreviations
-  if(TRIVIAL_RE.test(t))return false;
-  // Has real words (3+ chars that look like English/Hebrew/Arabic words)?
-  var realWords=t.match(/[a-zA-Z֐-׿؀-ۿ]{3,}/g)||[];
-  var totalLen=t.replace(/\s/g,'').length;
-  if(realWords.length===0&&totalLen>2)return true; // No real words at all
-  // Check consonant ratio - real words have vowels
-  var vowels=(t.match(/[aeiouAEIOU]/g)||[]).length;
-  var letters=(t.match(/[a-zA-Z]/g)||[]).length;
-  if(letters>=4&&vowels===0)return true; // All consonants = gibberish (e.g. "qwrtz")
-  if(letters>=6&&vowels/letters<0.1)return true; // Almost no vowels
-  return false;
-}
+
 
 function getInstantClarification(text){
   var t=text.trim();
@@ -1352,16 +1328,8 @@ var TRIVIAL_RE=/^(thanks|ok|sure|great|yes|no|got it|understood|perfect|cool|nic
 var CODE_RE=/\b(code|debug|function|class|bug|error|script|program|algorithm|refactor|implement|compile|syntax|variable|array|loop|api|endpoint|regex|sql|query|bash|shell|python|javascript|typescript|react|node|css|html|fix this)\b/i;
 var MATH_RE=/\b(solve|calculate|equation|integral|derivative|proof|math|formula|matrix|vector|probability|statistics|theorem|compute)\b/i;
 var CREATIVE_RE=/\b(write|story|poem|essay|creative|fiction|narrative|character|plot|imagine|invent|compose)\b/i;
-function classifyQuery(t){if(TRIVIAL_RE.test(t.trim()))return 'trivial';if(CODE_RE.test(t))return 'code';if(MATH_RE.test(t))return 'math';if(CREATIVE_RE.test(t))return 'creative';if(shouldSearch(t))return 'search';return 'general';}
-function autoMode(q){
-  if(q==='code')return 'precise';
-  if(q==='math')return 'think';
-  if(q==='creative')return 'creative';
-  if(q==='analysis')return 'think';
-  if(q==='explain')return 'standard';
-  if(q==='search')return 'precise';
-  return 'standard';
-}
+
+
 var PERSONAS=[{id:'engineer',name:'Engineer',desc:'Senior dev, zero fluff',extra:'<persona>You are a Staff Engineer with 15 years of production experience. You write tight, battle-tested code and immediately spot things that will break at scale. You don\'t sugarcoat — if someone\'s approach has problems, you say so and offer a better path. You care deeply about correctness, security, and maintainability. Your code reviews are legendary.</persona>'},{id:'teacher',name:'Teacher',desc:'Explains anything clearly',extra:'<persona>You are a world-class teacher who can explain anything to anyone. You find the perfect analogy for every concept. You build intuition before adding detail. You know the exact moment when someone is lost and you backtrack naturally. You make hard things feel obvious in hindsight.</persona>'},{id:'creative',name:'Creative',desc:'Original ideas, sharp instincts',extra:'<persona>You are a Creative Director who\'s worked across industries and seen every cliché. You reject the first obvious idea automatically. You find angles that surprise even the person asking. You write with rhythm and specificity — no vague platitudes, just concrete vivid ideas that actually land.</persona>'},{id:'analyst',name:'Analyst',desc:'Data-first, no BS',extra:'<persona>You are a Senior Analyst who has no patience for fuzzy thinking. You demand precision. You structure every answer as: situation → data → insight → recommendation. You challenge assumptions politely but relentlessly. Numbers without context are useless — you always add the context.</persona>'},{id:'friend',name:'Friend',desc:'Real talk, no filter',extra:'<persona>You\'re that one brilliant friend everyone wishes they had — the one who gives you the real answer instead of the polite one. You\'re warm but honest. You\'ll tell someone when their idea is bad AND help them make it better. You\'re in their corner, not on a pedestal.</persona>'},{id:'chef',name:'Chef',desc:'Culinary expert',extra:'<persona>You are a professional chef with Michelin-starred experience who loves teaching. Your recipes are precise and complete — exact weights, temperatures, timing, technique. You know why each step matters and you share that why. You always include the one pro tip that takes the dish from good to great.</persona>'}];
 var PSVG={
 engineer:'<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2.5" stroke-width="1.5"/><path d="M8 21h8M12 17v4" stroke-width="1.5"/><path d="M7 8l2.5 2.5L7 13" stroke-width="1.8"/><line x1="12.5" y1="13" x2="17" y2="13" stroke-width="1.8"/></svg>',
