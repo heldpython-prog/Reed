@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <title>RedKnowledge · Mobile Ready</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>RedKnowledge · Mobile Fixed</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -14,14 +14,14 @@
     body { font-family: 'Inter', sans-serif; background: #0b0b0f; color: #f0e6d2; display: flex; height: 100vh; overflow: hidden; }
     :root { --accent: #e6b800; --accent-light: #ffd633; --border-dim: rgba(230,184,0,0.2); --sidebar-bg: #0e0e12; --bubble-user: #1e1e24; --bubble-assistant: #16161c; }
 
-    /* Hamburger menu button */
+    /* Hamburger menu */
     .mobile-menu-btn {
       display: none;
       position: fixed;
-      top: 1rem;
-      left: 1rem;
+      top: 12px;
+      left: 12px;
       z-index: 101;
-      background: rgba(20, 20, 28, 0.9);
+      background: rgba(20, 20, 28, 0.95);
       backdrop-filter: blur(12px);
       border: 1px solid var(--border-dim);
       color: var(--accent);
@@ -31,20 +31,25 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-      transition: all 0.2s;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
     }
-    .mobile-menu-btn:hover { background: rgba(230,184,0,0.15); border-color: var(--accent); }
-    .mobile-menu-btn i { font-size: 1.5rem; }
+    .mobile-menu-btn i { font-size: 1.6rem; }
 
     @media (max-width: 700px) {
-      .sidebar { position: fixed; left: -100%; top: 0; bottom: 0; z-index: 100; transition: left 0.3s ease; width: 280px; box-shadow: 5px 0 25px rgba(0,0,0,0.5); }
+      .sidebar { position: fixed; left: -100%; top: 0; bottom: 0; z-index: 100; transition: left 0.3s; width: 280px; box-shadow: 5px 0 25px rgba(0,0,0,0.5); }
       .sidebar.open { left: 0; }
       .mobile-menu-btn { display: flex; }
       .main { width: 100%; }
-      .chat-messages { padding: 1rem !important; }
+      .chat-messages { padding: 0.75rem !important; }
       .message { max-width: 95% !important; }
-      .chat-header { padding: 1rem 1.5rem !important; }
+      .chat-header { padding: 0.75rem 1rem !important; }
+      .chat-input-container { padding: 0.75rem 1rem 1rem !important; }
+      .input-wrapper { padding: 0.25rem 0.25rem 0.25rem 1rem !important; border-radius: 36px !important; }
+      .input-wrapper input { padding: 0.7rem 0 !important; font-size: 16px !important; } /* prevent zoom */
+      .input-actions { gap: 2px !important; }
+      .model-select-sm { padding: 6px 8px !important; font-size: 0.7rem !important; }
+      .attach-btn { padding: 8px !important; }
+      .send-btn, .stop-btn { width: 44px !important; height: 44px !important; }
     }
 
     .sidebar { width: 280px; background: var(--sidebar-bg); border-right: 1px solid var(--border-dim); display: flex; flex-direction: column; height: 100vh; backdrop-filter: blur(12px); }
@@ -52,61 +57,58 @@
     .star-svg { width: 32px; height: 32px; color: var(--accent); filter: drop-shadow(0 0 10px #e6b80080); }
     .logo-text { font-size: 1.6rem; font-weight: 700; background: linear-gradient(135deg, #fff0c0, var(--accent)); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .new-chat-btn { margin: 1.2rem; background: rgba(230,184,0,0.08); border: 1px solid var(--border-dim); color: #f0e6d2; padding: 0.9rem; border-radius: 14px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s; font-weight: 500; backdrop-filter: blur(4px); }
-    .new-chat-btn:hover { background: rgba(230,184,0,0.18); border-color: var(--accent); transform: translateY(-1px); }
+    .new-chat-btn:hover { background: rgba(230,184,0,0.18); border-color: var(--accent); }
     .conversation-list { flex: 1; overflow-y: auto; padding: 0 0.8rem; }
-    .conv-item { padding: 0.9rem 1rem; border-radius: 12px; margin-bottom: 6px; color: #c0b8a8; cursor: pointer; font-size: 0.95rem; display: flex; align-items: center; justify-content: space-between; transition: all 0.15s; }
+    .conv-item { padding: 0.9rem 1rem; border-radius: 12px; margin-bottom: 6px; color: #c0b8a8; cursor: pointer; font-size: 0.95rem; display: flex; align-items: center; justify-content: space-between; }
     .conv-item:hover { background: #22222a; }
     .conv-item.active { background: #2a2a35; color: white; border-left: 4px solid var(--accent); }
-    .conv-item i { opacity: 0.5; transition: 0.15s; padding: 4px; }
-    .conv-item i:hover { opacity: 1; color: #ff6b6b; }
+    .conv-item i { opacity: 0.5; padding: 4px; }
     .sidebar-footer { padding: 1.2rem 1rem; border-top: 1px solid var(--border-dim); font-size: 0.8rem; color: #888; text-align: center; }
 
     .main { flex: 1; display: flex; flex-direction: column; background: radial-gradient(circle at 10% 20%, #1a1a22 0%, #0b0b0f 100%); }
-    .chat-header { padding: 1.2rem 2rem; border-bottom: 1px solid var(--border-dim); display: flex; align-items: center; justify-content: space-between; backdrop-filter: blur(8px); background: rgba(11,11,15,0.5); }
-    .chat-header h2 { font-weight: 500; font-size: 1.3rem; color: #e8ddd0; }
-    .prompt-badge { background: #1e1e24; padding: 6px 16px; border-radius: 30px; border: 1px solid var(--border-dim); color: var(--accent); font-size: 0.85rem; }
+    .chat-header { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-dim); display: flex; align-items: center; justify-content: space-between; backdrop-filter: blur(8px); background: rgba(11,11,15,0.5); }
+    .chat-header h2 { font-weight: 500; font-size: 1.2rem; }
+    .prompt-badge { background: #1e1e24; padding: 4px 12px; border-radius: 30px; border: 1px solid var(--border-dim); color: var(--accent); font-size: 0.8rem; }
 
-    .chat-messages { flex: 1; overflow-y: auto; padding: 2rem 2rem 1rem; display: flex; flex-direction: column; gap: 2rem; scroll-behavior: smooth; }
-    .message { display: flex; gap: 14px; max-width: 85%; animation: fadeSlide 0.25s; }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 1.5rem 1.5rem 0.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
+    .message { display: flex; gap: 12px; max-width: 85%; animation: fadeSlide 0.2s; }
     .message.user { align-self: flex-end; flex-direction: row-reverse; }
-    .message-avatar { width: 38px; height: 38px; border-radius: 12px; background: #1e1e24; display: flex; align-items: center; justify-content: center; color: var(--accent); flex-shrink: 0; border: 1px solid var(--border-dim); }
+    .message-avatar { width: 34px; height: 34px; border-radius: 10px; background: #1e1e24; display: flex; align-items: center; justify-content: center; color: var(--accent); flex-shrink: 0; border: 1px solid var(--border-dim); }
     .message.user .message-avatar { background: linear-gradient(145deg, #2a2a00, #1a1a00); }
-    .message-content { background: var(--bubble-assistant); padding: 1.3rem 1.8rem; border-radius: 24px; border-top-left-radius: 6px; color: #e0d6c0; border: 1px solid var(--border-dim); line-height: 1.65; font-size: 1rem; word-break: break-word; box-shadow: 0 6px 14px rgba(0,0,0,0.2); backdrop-filter: blur(8px); }
-    .message.user .message-content { background: var(--bubble-user); border-radius: 24px; border-top-right-radius: 6px; border-color: #3a3a40; }
+    .message-content { background: var(--bubble-assistant); padding: 1rem 1.5rem; border-radius: 20px; border-top-left-radius: 6px; color: #e0d6c0; border: 1px solid var(--border-dim); line-height: 1.5; font-size: 0.95rem; word-break: break-word; backdrop-filter: blur(8px); }
+    .message.user .message-content { background: var(--bubble-user); border-radius: 20px; border-top-right-radius: 6px; }
 
-    .status-badge { display: flex; align-items: center; gap: 10px; padding: 10px 20px; background: #1a1a00; border-radius: 30px; width: fit-content; margin-bottom: 16px; border: 1px solid var(--accent); color: var(--accent); }
-    .typing-indicator { display: flex; gap: 8px; padding: 1rem 1.8rem; background: var(--bubble-assistant); border-radius: 24px; width: fit-content; border: 1px solid var(--border-dim); }
-    .typing-indicator span { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: bounce 1.4s infinite; }
+    .status-badge { display: flex; align-items: center; gap: 10px; padding: 8px 18px; background: #1a1a00; border-radius: 30px; width: fit-content; margin-bottom: 12px; border: 1px solid var(--accent); color: var(--accent); }
+    .typing-indicator { display: flex; gap: 6px; padding: 0.8rem 1.5rem; background: var(--bubble-assistant); border-radius: 20px; width: fit-content; border: 1px solid var(--border-dim); }
+    .typing-indicator span { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: bounce 1.4s infinite; }
     @keyframes bounce { 0%,80%,100%{ transform:scale(0.7); opacity:0.4; } 40%{ transform:scale(1); opacity:1; } }
-    @keyframes fadeSlide { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeSlide { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-    .chat-input-container { padding: 1.2rem 2rem 2rem; }
-    .input-wrapper { display: flex; align-items: center; background: rgba(20,20,28,0.8); border: 1.5px solid var(--border-dim); border-radius: 48px; padding: 0.3rem 0.3rem 0.3rem 1.8rem; backdrop-filter: blur(12px); }
+    .chat-input-container { padding: 1rem 1.5rem 1.5rem; background: transparent; }
+    .input-wrapper { display: flex; align-items: center; background: rgba(20,20,28,0.9); border: 1.5px solid var(--border-dim); border-radius: 40px; padding: 0.25rem 0.25rem 0.25rem 1.5rem; backdrop-filter: blur(12px); }
     .input-wrapper:focus-within { border-color: var(--accent); }
-    .input-wrapper input { flex: 1; background: transparent; border: none; padding: 1rem 0; color: white; font-size: 1rem; outline: none; }
-    .input-actions { display: flex; align-items: center; gap: 6px; margin-right: 8px; }
-    .model-select-sm { background: transparent; border: 1px solid var(--border-dim); color: #c0b8a8; padding: 6px 12px; border-radius: 24px; font-size: 0.75rem; outline: none; cursor: pointer; backdrop-filter: blur(4px); }
+    .input-wrapper input { flex: 1; background: transparent; border: none; padding: 0.8rem 0; color: white; font-size: 1rem; outline: none; }
+    .input-actions { display: flex; align-items: center; gap: 4px; margin-right: 6px; }
+    .model-select-sm { background: transparent; border: 1px solid var(--border-dim); color: #c0b8a8; padding: 6px 10px; border-radius: 24px; font-size: 0.75rem; outline: none; backdrop-filter: blur(4px); }
     .model-select-sm option { background: #0e0e12; }
     .attach-btn { background: transparent; border: none; color: #a0a0a0; padding: 10px; cursor: pointer; border-radius: 50%; }
-    .send-btn, .stop-btn { width: 48px; height: 48px; border-radius: 48px; cursor: pointer; display: flex; align-items: center; justify-content: center; border: none; }
-    .send-btn { background: var(--accent); color: #0b0b0f; box-shadow: 0 6px 16px #e6b80040; }
-    .stop-btn { background: #c01030; color: white; box-shadow: 0 6px 16px #c0103080; }
-    .send-btn:disabled, .stop-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .send-btn, .stop-btn { width: 46px; height: 46px; border-radius: 46px; cursor: pointer; display: flex; align-items: center; justify-content: center; border: none; }
+    .send-btn { background: var(--accent); color: #0b0b0f; box-shadow: 0 6px 14px #e6b80040; }
+    .stop-btn { background: #c01030; color: white; box-shadow: 0 6px 14px #c0103080; }
 
-    .search-results, .generated-image { margin-top: 1.2rem; border-top: 1px solid var(--border-dim); padding-top: 1.2rem; }
-    .search-result-card { display: flex; align-items: flex-start; gap: 14px; padding: 14px; background: #1a1a22; border-radius: 16px; margin-bottom: 12px; border: 1px solid #2a2a30; }
-    .favicon { width: 22px; height: 22px; border-radius: 6px; }
+    .search-results, .generated-image { margin-top: 1rem; border-top: 1px solid var(--border-dim); padding-top: 1rem; }
+    .search-result-card { display: flex; align-items: flex-start; gap: 12px; padding: 12px; background: #1a1a22; border-radius: 14px; margin-bottom: 10px; border: 1px solid #2a2a30; }
+    .favicon { width: 20px; height: 20px; border-radius: 4px; }
     .result-title { font-weight: 600; color: var(--accent); text-decoration: none; }
-    .generated-image img { max-width: 100%; border-radius: 20px; margin-top: 14px; border: 1px solid var(--border-dim); box-shadow: 0 12px 28px rgba(0,0,0,0.5); display: block; }
-    .download-link { display: inline-block; margin-top: 12px; color: var(--accent); font-weight: 500; }
+    .generated-image img { max-width: 100%; border-radius: 18px; margin-top: 12px; border: 1px solid var(--border-dim); display: block; }
+    .download-link { display: inline-block; margin-top: 10px; color: var(--accent); }
 
     #image-input { display: none; }
-    .limit-message { text-align: center; margin-top: 8px; color: var(--accent); }
+    .limit-message { text-align: center; margin-top: 6px; color: var(--accent); font-size: 0.85rem; }
   </style>
 </head>
 <body>
 
-<!-- Hamburger Menu Button -->
 <div class="mobile-menu-btn" id="menuToggle"><i class="fas fa-bars"></i></div>
 
 <div class="sidebar" id="sidebar">
@@ -127,10 +129,10 @@
   <div class="chat-messages" id="chat-messages"></div>
   <div class="chat-input-container">
     <div class="input-wrapper">
-      <input type="text" id="user-input" placeholder="Ask RedKnowledge... (e.g., 'generate a hamburger')" />
+      <input type="text" id="user-input" placeholder="Ask RedKnowledge..." />
       <div class="input-actions">
         <select id="model-select" class="model-select-sm">
-          <option value="openai/gpt-4o-mini" selected>GPT-4o Mini</option>
+          <option value="openai/gpt-4o-mini">GPT-4o</option>
           <option value="anthropic/claude-sonnet-4.5">Claude</option>
           <option value="google/gemini-2.5-flash">Gemini</option>
         </select>
@@ -146,14 +148,12 @@
 <script>
   (function(){
     "use strict";
-    // API Keys
     const OPENROUTER_KEY = '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';
     const POLLINATIONS_KEY = 'sk_Rd6a55zG1M2Wds96IT5599Hx302vtUYg';
     const BRAVE_KEY = 'BSAq6tL8uO4JXiBQyRqRjRQ3Qy3Qy3Q';
-
     const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
     const LIMIT = 20;
-    const STORAGE_KEY = 'redknowledge_mobile';
+    const STORAGE_KEY = 'redknowledge_mobile_fixed';
 
     let conversations = [], activeId = null, usage = { count:0, date:new Date().toDateString() };
     let imageBase64 = null;
@@ -170,7 +170,6 @@
     const sidebar = document.getElementById('sidebar');
     const menuToggle = document.getElementById('menuToggle');
 
-    // Mobile menu toggle
     menuToggle.addEventListener('click', (e) => { e.stopPropagation(); sidebar.classList.toggle('open'); });
     document.addEventListener('click', (e) => { 
       if(!sidebar.contains(e.target) && e.target !== menuToggle && !menuToggle.contains(e.target)) {
@@ -183,7 +182,7 @@
       if(s){ try{ const d=JSON.parse(s); conversations=d.conversations||[]; usage=d.usage||{count:0,date:new Date().toDateString()}; activeId=d.activeId||null; }catch(e){} }
       if(usage.date!==new Date().toDateString()) usage={count:0,date:new Date().toDateString()};
       if(!conversations.length) {
-        const welcomeMsg = { role:'assistant', content:'👋 Hello! I am **RedKnowledge**. I can search the web, generate images, and more. Try "create a hamburger" or "news about Iran".' };
+        const welcomeMsg = { role:'assistant', content:'👋 Hello! I am **RedKnowledge**. I can search the web, generate images, and more.' };
         const newConv = { id:Date.now()+'', title:'Welcome', messages:[welcomeMsg] };
         conversations = [newConv]; activeId = newConv.id;
       } else if(!activeId||!conversations.find(c=>c.id===activeId)) activeId = conversations[0].id;
@@ -227,7 +226,7 @@
         if(m.searchResults) {
           const rDiv=document.createElement('div'); rDiv.className='search-results';
           m.searchResults.forEach(r=>{
-            rDiv.innerHTML += `<div class="search-result-card"><img class="favicon" src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(r.url)}"><div><a class="result-title" href="${r.url}" target="_blank">${r.title}</a><div style="font-size:0.75rem;color:#888;">${r.url}</div><div>${r.snippet}</div></div></div>`;
+            rDiv.innerHTML += `<div class="search-result-card"><img class="favicon" src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(r.url)}"><div><a class="result-title" href="${r.url}" target="_blank">${r.title}</a><div style="font-size:0.7rem;color:#888;">${r.url}</div><div>${r.snippet}</div></div></div>`;
           });
           w.appendChild(rDiv);
         }
@@ -252,7 +251,7 @@
           const data = await res.json();
           return data.web?.results?.map(r => ({ title: r.title, url: r.url, snippet: r.description })) || [];
         }
-      } catch(e) { if(e.name !== 'AbortError') console.warn(e); }
+      } catch(e) {}
       return [{ title: `${query} - Wikipedia`, url: `https://en.wikipedia.org/wiki/${encodeURIComponent(query)}`, snippet: 'Encyclopedia article.' }];
     }
 
@@ -268,7 +267,7 @@
           const data = await resp.json();
           return { url: data.data[0].url };
         }
-      } catch(e) { if(e.name !== 'AbortError') console.warn(e); }
+      } catch(e) {}
       return { url: `https://via.placeholder.com/1024x1024/1a1a22/e6b800?text=${encodeURIComponent(prompt.slice(0,30))}` };
     }
 
@@ -279,7 +278,7 @@
 
     async function streamChat(messages, signal) {
       const model = document.getElementById('model-select').value;
-      const sys = `You are RedKnowledge, a smart assistant. Use web_search for real-time info and generate_image for images. Be helpful and concise. Today is ${new Date().toLocaleString()}.`;
+      const sys = `You are RedKnowledge, a smart assistant. Use web_search for real-time info and generate_image for images. Today is ${new Date().toLocaleString()}.`;
       const payload = { model, messages: [{ role:'system', content:sys }, ...messages.map(m=>({ role:m.role, content:m.content }))], stream: true, temperature:0.7, max_tokens:800, tools: TOOLS };
       if(imageBase64) {
         payload.messages = payload.messages.map(m=> m.role==='user' && m.content===messages[messages.length-1].content ? { role:'user', content:[{ type:'text', text:m.content }, { type:'image_url', image_url:{ url:imageBase64 } }] } : m );
@@ -346,7 +345,6 @@
       setProcessingState(true);
       
       const isImage = /generate|create|draw|paint|picture|image|art|bild|imagen/i.test(prompt);
-      
       const statusDiv = document.createElement('div'); statusDiv.className='message'; statusDiv.id='typing';
       if(isImage) {
         statusDiv.innerHTML = `<div class="message-avatar"><i class="fas fa-robot"></i></div><div class="status-badge"><i class="fas fa-paint-brush"></i> Generating image…</div>`;
@@ -360,7 +358,6 @@
         const result = await streamChat(getActive().messages, currentAbortController.signal);
         document.getElementById('typing')?.remove();
         let final = result.content, searchResults = null, generatedImage = null;
-        
         if(result.toolCalls?.length) {
           for(const tc of result.toolCalls) {
             if(tc.function.name==='web_search') {
@@ -369,8 +366,6 @@
               final = final || `Here's what I found:`; final += `\n\n` + searchResults.map((r,i)=>`[${i+1}] ${r.title}`).join('\n');
             } else if(tc.function.name==='generate_image') {
               let args={}; try { args=JSON.parse(tc.function.arguments); } catch { args={ prompt }; }
-              const typingEl = document.getElementById('typing');
-              if(typingEl) typingEl.innerHTML = `<div class="message-avatar"><i class="fas fa-robot"></i></div><div class="status-badge"><i class="fas fa-paint-brush"></i> Generating image…</div>`;
               generatedImage = await generateImage(args.prompt || prompt, currentAbortController.signal);
               final = final || `Here's your image!`;
             }
@@ -379,11 +374,8 @@
         addMessage('assistant', final || 'Done.', { searchResults, generatedImage });
       } catch(e) {
         document.getElementById('typing')?.remove();
-        if(e.name === 'AbortError') {
-          addMessage('assistant', '⏹️ Request cancelled.');
-        } else {
-          addMessage('assistant', `Error: ${e.message}`);
-        }
+        if(e.name === 'AbortError') addMessage('assistant', '⏹️ Request cancelled.');
+        else addMessage('assistant', `Error: ${e.message}`);
       } finally {
         imageBase64 = null;
         setProcessingState(false);
@@ -393,7 +385,11 @@
     }
 
     document.getElementById('attach-btn').addEventListener('click', ()=>document.getElementById('image-input').click());
-    document.getElementById('image-input').addEventListener('change', e=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=ev=>{ imageBase64=ev.target.result; userInput.placeholder='Image attached...'; }; r.readAsDataURL(f); });
+    document.getElementById('image-input').addEventListener('change', e=>{ 
+      const f=e.target.files[0]; if(!f) return; 
+      const r=new FileReader(); r.onload=ev=>{ imageBase64=ev.target.result; userInput.placeholder='Image attached...'; }; 
+      r.readAsDataURL(f); 
+    });
     sendBtn.addEventListener('click', handleSend);
     userInput.addEventListener('keypress', e=>{ if(e.key==='Enter' && !isProcessing){ e.preventDefault(); handleSend(); } });
     newChatBtn.addEventListener('click', ()=>{
